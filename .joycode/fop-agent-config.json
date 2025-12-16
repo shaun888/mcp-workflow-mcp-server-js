@@ -79,7 +79,7 @@
         "现有代码架构分析（可选）"
       ],
       "output": {
-        "location": ".joycode/flowcharts/",
+        "location": "fop/.joycode/flowcharts/",
         "filename": "{需求名称}-{流程类型}-{日期}.md",
         "examples": [
           "库存管理优化-business_process_flow-20250909.md",
@@ -93,7 +93,7 @@
         "基于实际代码调用关系生成业务流程图",
         "明确文件位置和命名规范"
       ],
-      "rulesFile": ".joycode/rules/flowchart-generation-rules.json",
+      "rulesFile": "fop/.joycode/rules/flowchart-generation-rules.json",
       "optimization": {
         "avoidReAccess": true,
         "reuseAnalysis": "直接使用已生成的PRD分析文档",
