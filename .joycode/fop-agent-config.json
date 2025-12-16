@@ -1,0 +1,237 @@
+{
+  "agentName": "柯南智能体",
+  "version": "3.0.0",
+  "description": "京东FOP平台专业开发助手，负责需求分析、链路梳理和代码生成",
+  "lastUpdated": "2025-09-10",
+
+  "workflowConfig": {
+    "stage1_prd_analysis": {
+      "name": "PRD需求分析阶段",
+      "input": "JoySpace PRD链接",
+      "output": {
+        "location": ".joycode/",
+        "filename": "prd-analysis-summary.md",
+        "description": "使用需求名称命名，便于识别和管理"
+      },
+      "process": [
+        "不允许直接使用joyspace-mcp服务器来获取页面的详细内容，因为没有权限",
+        "使用https方式访问JoySpace PRD文档（如遇权限问题提示扫码登录）",
+        "读取完PRD后或者关闭浏览器后立马生成prd需求分析，不允许多次打开浏览器，梳理后立马开始后续阶段，后续阶段使用梳理后的prd进行",
+        "深度解析需求文档，提取业务逻辑和技术要求注意：主要关注prd中第一项内容：需求概述章节的内容，这是核心。包括：\n   - 需求概述（必选）\n   - 需求背景&业务现状（必选）\n   - 需求目标&收益（必选）",
+        "识别系统模块和数据流向",
+        "生成结构化PRD分析文档"
+      ],
+      "rulesFile": ".joycode/rules/prd-analysis-rules.json"
+    },
+
+    "stage2_code_generation": {
+      "name": "代码生成阶段",
+      "priority": "优先执行，为流程图生成提供实际代码基础",
+      "input": [
+        "已生成的{需求名称}-prd-analysis-summary.md文件（必选）"
+      ],
+      "output": {
+        "location": ".joycode/generated-code/",
+        "filename": "{需求名称}-{模块类型}-{时间戳}.java",
+        "examples": [
+          "库存管理优化-api-20250909.java",
+          "库存管理优化-service-20250909.java"
+        ]
+      },
+      "process": [
+        "**不再重新访问PRD链接**",
+        "基于第一阶段已生成的{需求名称}-prd-analysis-summary.md",
+        "遵循.joycode/rules/代码规范",
+        "按照FOP项目模块结构生成代码，修改代码，实现需求",
+        "生成代码生成日志文档到指定目录"
+      ],
+      "rulesFile": ".joycode/rules/code-generation-rules.json",
+      "smartCodeRetrieval": {
+        "enabled": true,
+        "description": "智能代码检索优化策略",
+        "strategies": [
+          "方法签名预分析：检查方法名、入参、返回值类型判断相关性",
+          "业务关键词匹配：基于需求关键词快速过滤相关代码",
+          "调用链路智能剪枝：优先分析核心调用路径，跳过无关分支",
+          "缓存机制：已分析过的无关方法直接跳过",
+          "深度限制：设置最大分析深度，避免无限递归"
+        ],
+        "filterCriteria": [
+          "方法名包含业务关键词",
+          "入参或返回值与需求数据类型匹配",
+          "在核心业务调用链路上",
+          "最近修改时间在合理范围内"
+        ]
+      },
+      "optimization": {
+        "avoidReAccess": true,
+        "reuseAnalysis": "直接使用已生成的PRD分析文档",
+        "intelligentFiltering": "使用智能过滤减少不必要的代码检索"
+      }
+    },
+
+    "stage3_flowchart_generation": {
+      "name": "流程图生成阶段",
+      "priority": "在代码生成后执行，基于实际代码生成更准确的流程图",
+      "input": [
+        "已生成的{需求名称}-prd-analysis-summary.md文件（必选）",
+        "已生成的代码文件（必选，用于技术架构图优化）",
+        "现有代码架构分析（可选）"
+      ],
+      "output": {
+        "location": ".joycode/flowcharts/",
+        "filename": "{需求名称}-{流程类型}-{日期}.md",
+        "examples": [
+          "库存管理优化-business_process_flow-20250909.md",
+          "库存管理优化-technical_architecture_flow-20250909.md"
+        ]
+      },
+      "process": [
+        "**不再重新访问PRD链接**",
+        "基于第一阶段生成的{需求名称}-prd-analysis-summary.md",
+        "结合第二阶段生成的实际代码，生成精确的技术架构图",
+        "基于实际代码调用关系生成业务流程图",
+        "明确文件位置和命名规范"
+      ],
+      "rulesFile": ".joycode/rules/flowchart-generation-rules.json",
+      "optimization": {
+        "avoidReAccess": true,
+        "reuseAnalysis": "直接使用已生成的PRD分析文档",
+        "codeBasedGeneration": "基于实际生成的代码生成流程图，确保准确性"
+      },
+      "advantages": [
+        "基于实际代码生成，流程图更准确可靠",
+        "反映真实的技术实现架构",
+        "便于代码review和后续维护"
+      ]
+    }
+  },
+
+  "executionSequence": {
+    "description": "优化后的执行顺序：先生成代码，再生成流程图",
+    "rationale": [
+      "代码生成是核心任务，应优先完成",
+      "基于实际代码生成的流程图更准确",
+      "流程图可作为代码的文档补充"
+    ],
+    "sequence": [
+      "stage1_prd_analysis",
+      "stage2_code_generation",
+      "stage3_flowchart_generation"
+    ]
+  },
+
+  "smartRetrievalConfig": {
+    "codeAnalysisOptimization": {
+      "preAnalysisFilters": [
+        {
+          "name": "方法签名分析",
+          "description": "分析方法名、参数、返回值判断业务相关性",
+          "weight": 0.4
+        },
+        {
+          "name": "业务关键词匹配",
+          "description": "基于需求提取的关键词进行代码过滤",
+          "weight": 0.3
+        },
+        {
+          "name": "调用链路分析",
+          "description": "优先分析核心调用链路，跳过边缘方法",
+          "weight": 0.3
+        }
+      ],
+      "skipConditions": [
+        "方法名明显与需求无关（如工具类、配置类）",
+        "参数类型与需求数据模型不匹配",
+        "在调用链路的边缘位置且非核心逻辑",
+        "已标记为无关的方法（缓存机制）"
+      ],
+      "maxAnalysisDepth": 5,
+      "cacheStrategy": "缓存已分析的无关方法，避免重复分析"
+    },
+
+    "performanceMetrics": {
+      "targetReduction": "减少70%的无效代码检索",
+      "accuracyTarget": "保持95%以上的相关代码识别准确率",
+      "speedImprovement": "提升3-5倍的代码分析速度"
+    }
+  },
+
+  "fileNamingRules": {
+    "principle": "所有生成文件使用需求名称作为前缀，便于识别和管理",
+    "patterns": {
+      "prd_analysis": "{需求名称}-prd-analysis-summary.md",
+      "code": "{需求名称}-{模块}-{时间戳}.java",
+      "flowchart": "{需求名称}-{类型}-{日期}.md",
+      "log": "{需求名称}-{阶段}-log-{时间戳}.md"
+    }
+  },
+
+  "optimizationRules": {
+    "avoidDuplicateWork": {
+      "stage1": "访问PRD链接，生成分析文档",
+      "stage2": "基于分析文档生成代码，使用智能检索优化",
+      "stage3": "基于分析文档和生成的代码生成流程图"
+    },
+    "intelligentRetrieval": {
+      "description": "使用智能过滤算法提升代码检索效率",
+      "implementation": "预分析方法签名，快速过滤无关代码"
+    },
+    "timeEfficiency": {
+      "description": "避免重复网络请求和无效代码分析",
+      "implementation": "文档复用 + 智能代码过滤 + 缓存机制"
+    }
+  },
+
+  "coreCapabilities": {
+    "documentAccess": {
+      "joyspaceAccess": "通过浏览器直接访问JoySpace文档",
+      "authHandling": "遇到权限问题时提示用户扫码登录",
+      "contentParsing": "深度解析需求文档，提取关键信息"
+    },
+
+    "intelligentCodeAnalysis": {
+      "smartFiltering": "基于方法签名和业务关键词的智能过滤",
+      "callChainOptimization": "优化调用链路分析，跳过无关分支",
+      "cacheStrategy": "缓存分析结果，避免重复工作",
+      "performanceMonitoring": "监控分析效率，持续优化"
+    },
+
+    "linkAnalysis": {
+      "businessFlow": "从用户请求到系统响应的完整业务流程分析",
+      "technicalTrace": "API调用、数据库操作、消息队列等技术组件交互追踪",
+      "dependencyMapping": "识别模块间依赖关系和数据传递路径",
+      "exceptionHandling": "梳理错误处理和回滚机制"
+    },
+
+    "codeGeneration": {
+      "standards": "严格遵循fop/fop/.JoyCoderRules代码规范",
+      "structure": "按照FOP项目模块划分生成代码",
+      "quality": "保持代码风格一致性和可读性",
+      "documentation": "添加必要的注释和文档"
+    }
+  },
+
+  "configurationFiles": {
+    "mainConfig": ".joycode/fop-agent-config.json",
+    "codeRules": ".joycode/.JoyCoderRules",
+    "ruleFiles": [
+      ".joycode/rules/prd-analysis-rules.json",
+      ".joycode/rules/code-generation-rules.json",
+      ".joycode/rules/flowchart-generation-rules.json"
+    ]
+  },
+
+  "mcpServers": {
+    "joyspace-mcp": "用于访问JoySpace文档",
+    "autoBots": "自动化工具支持"
+  },
+
+  "directoryStructure": {
+    "analysis": "fop/.joycode/",
+    "generatedCode": "fop/.joycode/generated-code/",
+    "flowcharts": "fop/.joycode/flowcharts/",
+    "logs": "fop/.joycode/logs/",
+    "rules": "fop/.joycode/rules/"
+  }
+}

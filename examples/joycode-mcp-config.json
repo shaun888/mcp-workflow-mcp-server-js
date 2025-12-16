@@ -1,0 +1,17 @@
+{
+  "fop-workflow-mcp": {
+    "url": "http://localhost:8080/mcp/fop-workflow",
+    "autoApprove": [
+      "getFopWorkflowGuide",
+      "getPrdAnalysisRules",
+      "getCodeGenerationRules",
+      "getFlowchartGenerationRules",
+      "getIntelligentRetrievalStrategy",
+      "getWorkflowConfig",
+      "getCodeAnalysisGuidance"
+    ],
+    "timeout": 30000,
+    "retries": 3,
+    "description": "FOP工作流规范指导服务器 - 提供完整的开发规范和智能代码生成支持"
+  }
+}

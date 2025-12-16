@@ -1,0 +1,176 @@
+{
+  "ruleName": "PRD分析规则-优化版",
+  "version": "2.0.0",
+  "description": "针对JoySpace PRD文档优化的快速精准分析规则",
+  "documentRecognition": {
+    "templateContentFilters": {
+      "skipKeywords": [
+        "此处填写具体内容",
+        "请根据实际情况填写",
+        "模板说明",
+        "填写指南",
+        "示例内容",
+        "参考格式",
+        "可选填写",
+        "根据需要补充"
+      ],
+      "templateSectionPatterns": [
+        "^.*模板.*$",
+        "^.*说明.*$",
+        "^.*指南.*$",
+        "^.*示例.*$"
+      ],
+      "contentValidationRules": [
+        "段落长度超过50字符认为是实际内容",
+        "包含具体数字、时间、人名的认为是实际内容",
+        "包含具体业务术语的认为是实际内容"
+      ]
+    },
+    "navigationOptimization": {
+      "prioritySections": [
+        "需求背景",
+        "业务现状", 
+        "问题描述",
+        "核心需求",
+        "技术方案",
+        "接口设计"
+      ],
+      "quickAccessStrategy": "优先点击左侧导航定位到核心章节，跳过模板说明部分"
+    }
+  },
+  "analysisFramework": {
+    "coreContentExtraction": {
+      "primarySection": {
+        "name": "需求背景&业务现状",
+        "priority": "CRITICAL",
+        "keywords": ["需求背景", "业务现状", "现状分析", "问题描述", "业务痛点"],
+        "extractionRules": [
+          "提取具体业务场景和问题描述",
+          "识别涉及的系统模块和接口",
+          "分析数据流向和业务逻辑",
+          "提取关键业务指标和数据"
+        ],
+        "contentValidation": "必须包含具体的业务问题和现状描述，不能是模板内容"
+      },
+      "secondarySection": {
+        "name": "技术实现方案",
+        "priority": "HIGH", 
+        "keywords": ["技术方案", "实现方案", "接口设计", "数据库设计", "架构设计"],
+        "extractionRules": [
+          "提取涉及的技术栈和框架",
+          "识别需要修改的接口和服务",
+          "分析数据库表结构变更",
+          "提取性能和安全要求"
+        ]
+      },
+      "supportingSections": {
+        "name": "其他相关信息",
+        "priority": "MEDIUM",
+        "keywords": ["验收标准", "测试方案", "上线计划", "风险评估"],
+        "extractionRules": [
+          "提取验收标准和测试要点",
+          "识别潜在风险和应对措施"
+        ]
+      }
+    },
+    "fopSpecificAnalysis": {
+      "systemModuleMapping": {
+        "keywords": ["fop-instock", "fop-outstock", "fop-service", "fop-web"],
+        "extractionRules": [
+          "识别涉及的FOP子系统",
+          "分析模块间调用关系",
+          "提取接口变更需求"
+        ]
+      },
+      "businessProcessAnalysis": {
+        "keywords": ["预约", "入库", "出库", "库存", "包裹", "箱数"],
+        "extractionRules": [
+          "梳理完整业务流程链路",
+          "识别关键业务节点",
+          "分析数据传递路径"
+        ]
+      }
+    }
+  },
+  "speedOptimization": {
+    "readingStrategy": {
+      "navigationFirst": "优先使用左侧导航快速定位到重点章节",
+      "contentScanning": "快速扫描识别模板内容并跳过",
+      "focusedReading": "重点阅读需求背景和技术方案部分",
+      "keywordHighlighting": "重点关注业务关键词和技术术语"
+    },
+    "contentPrioritization": {
+      "level1": "需求背景&业务现状（必读）",
+      "level2": "技术方案&接口设计（重要）", 
+      "level3": "验收标准&测试方案（补充）",
+      "skip": "模板说明、填写指南等（跳过）"
+    }
+  },
+  "accuracyEnhancement": {
+    "contextValidation": {
+      "businessContextCheck": "验证提取的内容是否符合FOP业务场景",
+      "technicalConsistencyCheck": "确保技术方案与现有架构一致",
+      "completenessCheck": "检查是否遗漏关键业务信息"
+    },
+    "qualityMetrics": {
+      "contentRelevance": "提取内容与FOP业务的相关度",
+      "technicalAccuracy": "技术方案的准确性和可行性",
+      "completeness": "需求分析的完整性"
+    }
+  },
+  "outputOptimization": {
+    "fileNamingRules": {
+      "outputDirectory": "fop/.joycode/",
+      "filenamePattern": "{prd_title}-prd-analysis-summary.md",
+      "description": "使用PRD标题作为文件名前缀，便于识别和管理"
+    },
+    "documentStructure": [
+      "# {PRD标题} - 需求分析报告",
+      "",
+      "## 📋 核心需求概述",
+      "### 业务问题",
+      "### 解决方案",
+      "### 预期收益",
+      "",
+      "## 🔍 业务分析",
+      "### 当前业务现状",
+      "### 存在问题分析", 
+      "### 业务流程梳理",
+      "",
+      "## 🛠 技术实现方案",
+      "### 涉及系统模块",
+      "### 接口设计要求",
+      "### 数据库变更",
+      "### 关键技术点",
+      "",
+      "## 🔗 业务链路分析",
+      "### 完整业务流程",
+      "### 系统调用链路",
+      "### 数据流向分析",
+      "",
+      "## ⚠️ 风险评估与建议",
+      "### 技术风险",
+      "### 业务风险", 
+      "### 实施建议"
+    ]
+  },
+  "joyspaceSpecificRules": {
+    "navigationUsage": {
+      "leftSidebarStrategy": "优先点击左侧导航栏快速定位",
+      "sectionJumping": "跳过模板说明，直接定位到实际内容",
+      "contentValidation": "通过内容长度和关键词判断是否为实际需求"
+    },
+    "templateRecognition": {
+      "emptyTemplateIndicators": [
+        "内容长度少于20字符",
+        "包含'请填写'、'待补充'等提示词",
+        "格式化的示例内容"
+      ],
+      "realContentIndicators": [
+        "包含具体的业务数据和指标",
+        "描述具体的问题场景",
+        "包含技术细节和实现方案"
+      ]
+    }
+  }
+}

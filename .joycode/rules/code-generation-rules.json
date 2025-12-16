@@ -1,0 +1,223 @@
+{
+  "ruleName": "FOP代码生成规范",
+  "version": "3.0.0",
+  "description": "京东FOP平台代码生成规范，集成智能检索优化策略",
+  "lastUpdated": "2025-09-10",
+  
+  "intelligentRetrievalStrategy": {
+    "enabled": true,
+    "description": "智能代码检索优化，提升代码分析效率",
+    "preAnalysisFilters": {
+      "methodSignatureAnalysis": {
+        "enabled": true,
+        "weight": 0.4,
+        "description": "分析方法签名判断业务相关性",
+        "criteria": [
+          "方法名包含业务关键词（如instock、outstock、order、package等）",
+          "参数类型与需求数据模型匹配",
+          "返回值类型与预期输出一致",
+          "方法注释包含相关业务描述"
+        ]
+      },
+      "businessKeywordMatching": {
+        "enabled": true,
+        "weight": 0.3,
+        "description": "基于需求关键词快速过滤代码",
+        "implementation": "从PRD分析文档提取关键词，匹配代码中的类名、方法名、注释"
+      },
+      "callChainAnalysis": {
+        "enabled": true,
+        "weight": 0.3,
+        "description": "优先分析核心调用链路",
+        "strategy": "从入口方法开始，优先分析主要业务流程，跳过工具类和配置类"
+      }
+    },
+    
+    "skipConditions": [
+      {
+        "condition": "工具类方法",
+        "description": "明显的工具类方法（如StringUtils、DateUtils等）",
+        "pattern": ".*Utils.*|.*Helper.*|.*Constant.*"
+      },
+      {
+        "condition": "配置类方法",
+        "description": "配置相关的类和方法",
+        "pattern": ".*Config.*|.*Properties.*|.*Setting.*"
+      },
+      {
+        "condition": "参数类型不匹配",
+        "description": "方法参数类型与需求数据模型完全不匹配"
+      },
+      {
+        "condition": "调用链路边缘",
+        "description": "在调用链路的边缘位置且非核心业务逻辑"
+      },
+      {
+        "condition": "已缓存为无关",
+        "description": "已经分析过并标记为与当前需求无关的方法"
+      }
+    ],
+    
+    "cacheStrategy": {
+      "enabled": true,
+      "description": "缓存已分析的方法，避免重复分析",
+      "cacheTypes": [
+        "irrelevantMethods: 缓存已确认无关的方法",
+        "analyzedPaths: 缓存已分析的调用路径",
+        "businessKeywords: 缓存从需求提取的业务关键词"
+      ]
+    },
+    
+    "performanceOptimization": {
+      "maxAnalysisDepth": 5,
+      "maxMethodsPerClass": 20,
+      "timeoutPerMethod": "30秒",
+      "parallelAnalysis": true,
+      "description": "设置分析深度和时间限制，避免无限递归和超时"
+    }
+  },
+  
+  "codeAnalysisWorkflow": {
+    "step1_requirement_extraction": {
+      "description": "从PRD分析文档提取业务关键词和数据模型",
+      "output": "业务关键词列表、核心数据结构、主要业务流程"
+    },
+    "step2_entry_point_identification": {
+      "description": "识别代码入口点（Controller、Provider、Service等）",
+      "strategy": "基于业务关键词匹配，找到最相关的入口方法"
+    },
+    "step3_smart_code_traversal": {
+      "description": "智能代码遍历，使用过滤策略减少无效分析",
+      "process": [
+        "对每个方法进行预分析（方法签名、注释、调用关系）",
+        "应用过滤条件，跳过明显无关的方法",
+        "优先分析核心业务流程",
+        "缓存分析结果，避免重复工作"
+      ]
+    },
+    "step4_code_modification": {
+      "description": "基于需求对相关代码进行修改",
+      "strategy": "只修改通过智能过滤确认相关的代码部分"
+    }
+  },
+  
+  "codeGenerationRules": {
+    "projectStructure": {
+      "description": "严格按照FOP项目结构生成代码",
+      "modules": [
+        "fop-{module}-api: 接口定义",
+        "fop-{module}-support: 业务实现",
+        "fop-{module}-main: 启动配置"
+      ]
+    },
+    
+    "namingConventions": {
+      "packages": "com.jd.fop.{module}.{layer}",
+      "classes": "Pascal命名法，业务含义清晰",
+      "methods": "camelCase命名法，动词开头",
+      "variables": "camelCase命名法，名词性质",
+      "constants": "UPPER_SNAKE_CASE命名法"
+    },
+    
+    "codeStandards": {
+      "keyPoints": [
+        "类和方法必须有完整的JavaDoc注释",
+        "业务逻辑与数据访问分离",
+        "异常处理规范，使用统一的异常体系",
+        "日志记录规范，关键业务节点必须记录",
+        "参数校验，防止SQL注入和XSS攻击"
+      ]
+    },
+    
+    "qualityAssurance": {
+      "codeReview": {
+        "description": "生成代码前进行逻辑检查",
+        "checkItems": [
+          "业务逻辑正确性",
+          "数据流向合理性", 
+          "异常处理完整性",
+          "性能考虑（数据库查询、缓存使用）",
+          "安全规范（参数校验、权限控制）"
+        ]
+      },
+      "performanceConsiderations": [
+        "数据库查询优化，避免N+1问题",
+        "合理使用缓存，提升响应速度",
+        "批量操作优化，减少数据库交互",
+        "异步处理耗时操作"
+      ],
+      "securityStandards": [
+        "输入参数严格校验",
+        "SQL注入防护",
+        "XSS攻击防护",
+        "敏感数据加密存储",
+        "接口权限控制"
+      ]
+    }
+  },
+  
+  "outputSpecification": {
+    "codeFiles": {
+      "location": "fop/.joycode/generated-code/",
+      "naming": "{需求名称}-{模块类型}-{时间戳}.java",
+      "structure": [
+        "package声明",
+        "import语句",
+        "类注释（包含需求描述、作者、创建时间）",
+        "类定义",
+        "字段定义",
+        "方法实现（包含详细注释）"
+      ]
+    },
+    
+    "documentationFiles": {
+      "codeGenerationLog": {
+        "location": "fop/.joycode/logs/",
+        "filename": "{需求名称}-code-generation-log-{时间戳}.md",
+        "content": [
+          "需求分析摘要",
+          "代码生成策略",
+          "智能检索统计（过滤的方法数、分析的方法数、命中率等）",
+          "生成的代码文件列表",
+          "质量检查结果",
+          "性能优化建议"
+        ]
+      }
+    }
+  },
+  
+  "intelligentRetrievalMetrics": {
+    "efficiency": {
+      "targetReduction": "减少70%的无效代码检索",
+      "accuracyTarget": "保持95%以上的相关代码识别准确率",
+      "speedImprovement": "提升3-5倍的代码分析速度"
+    },
+    "monitoring": {
+      "filteredMethods": "记录被过滤掉的方法数量",
+      "analyzedMethods": "记录实际分析的方法数量",
+      "hitRate": "记录关键词匹配的命中率",
+      "analysisTime": "记录代码分析耗时"
+    }
+  },
+  
+  "errorHandling": {
+    "analysisTimeout": {
+      "action": "超时后跳过当前方法，记录日志",
+      "fallback": "使用基础分析策略"
+    },
+    "filterFailure": {
+      "action": "过滤失败时使用传统全量分析",
+      "logging": "记录过滤失败的原因和方法信息"
+    },
+    "cacheCorruption": {
+      "action": "清空缓存，重新开始分析",
+      "prevention": "定期验证缓存数据完整性"
+    }
+  },
+  "futureOptimizations": [
+    "机器学习模型预测方法相关性",
+    "基于历史数据优化过滤策略",
+    "自动化代码质量评分",
+    "智能重构建议生成"
+  ]
+}

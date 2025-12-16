@@ -1,0 +1,2 @@
+junit用4 的版本
+mock ，injectmock这些不能忘了，用模拟数据的方式走好单测的链路

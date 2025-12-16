@@ -1,0 +1,209 @@
+{
+  "ruleName": "流程图生成规则",
+  "version": "1.0.0",
+  "description": "用于第二阶段基于PRD分析结果生成流程图的规则配置",
+  "dataSourceRules": {
+    "primarySource": "fop/.joycode/prd-analysis-summary.md",
+    "secondarySource": "fop/.joycode/flowcharts/",
+    "description": "优先使用已生成的PRD分析文档，避免重复访问原始PRD链接",
+    "avoidReAccess": true,
+    "reuseAnalysis": "直接基于第一阶段生成的prd-analysis-summary.md进行代码生成"
+  },
+  "flowchartTypes": {
+    "businessFlowcharts": {
+      "userOperationFlow": {
+        "description": "用户操作流程图",
+        "mermaidType": "flowchart TD",
+        "elements": [
+          "用户入口点",
+          "操作步骤",
+          "决策点",
+          "结果输出",
+          "异常处理"
+        ],
+        "template": [
+          "```mermaid",
+          "flowchart TD",
+          "    A[用户开始] --> B{身份验证}",
+          "    B -->|通过| C[执行操作]",
+          "    B -->|失败| D[返回错误]",
+          "    C --> E{操作结果}",
+          "    E -->|成功| F[返回成功结果]",
+          "    E -->|失败| G[异常处理]",
+          "    G --> H[记录日志]",
+          "    H --> I[返回错误信息]",
+          "```"
+        ]
+      },
+      "businessProcessFlow": {
+        "description": "业务流程图",
+        "mermaidType": "flowchart LR",
+        "elements": [
+          "业务触发点",
+          "业务规则判断",
+          "业务处理步骤",
+          "状态变更",
+          "通知机制"
+        ]
+      },
+      "dataFlow": {
+        "description": "数据流向图",
+        "mermaidType": "flowchart TB",
+        "elements": [
+          "数据源",
+          "数据处理",
+          "数据存储",
+          "数据输出",
+          "数据同步"
+        ]
+      }
+    },
+    "technicalArchitecture": {
+      "systemArchitecture": {
+        "description": "系统架构图",
+        "mermaidType": "graph TB",
+        "elements": [
+          "前端层",
+          "网关层",
+          "服务层",
+          "数据层",
+          "外部系统"
+        ],
+        "template": [
+          "```mermaid",
+          "graph TB",
+          "    subgraph \"前端层\"",
+          "        A[Web前端]",
+          "        B[移动端]",
+          "    end",
+          "    ",
+          "    subgraph \"网关层\"",
+          "        C[API网关]",
+          "    end",
+          "    ",
+          "    subgraph \"服务层\"",
+          "        D[业务服务]",
+          "        E[基础服务]",
+          "    end",
+          "    ",
+          "    subgraph \"数据层\"",
+          "        F[数据库]",
+          "        G[缓存]",
+          "    end",
+          "    ",
+          "    A --> C",
+          "    B --> C",
+          "    C --> D",
+          "    C --> E",
+          "    D --> F",
+          "    E --> G",
+          "```"
+        ]
+      },
+      "moduleDependendy": {
+        "description": "模块依赖图",
+        "mermaidType": "graph LR",
+        "elements": [
+          "核心模块",
+          "依赖模块",
+          "工具模块",
+          "外部依赖"
+        ]
+      },
+      "apiCallChain": {
+        "description": "API调用链路图",
+        "mermaidType": "sequenceDiagram",
+        "elements": [
+          "客户端",
+          "网关",
+          "业务服务",
+          "数据服务",
+          "外部服务"
+        ],
+        "template": [
+          "```mermaid",
+          "sequenceDiagram",
+          "    participant C as 客户端",
+          "    participant G as API网关",
+          "    participant S as 业务服务",
+          "    participant D as 数据服务",
+          "    participant E as 外部服务",
+          "    ",
+          "    C->>G: 发送请求",
+          "    G->>G: 身份验证",
+          "    G->>S: 转发请求",
+          "    S->>D: 查询数据",
+          "    D-->>S: 返回数据",
+          "    S->>E: 调用外部服务",
+          "    E-->>S: 返回结果",
+          "    S-->>G: 返回处理结果",
+          "    G-->>C: 返回响应",
+          "```"
+        ]
+      }
+    }
+  },
+  "generationRules": {
+    "inputAnalysis": {
+      "readPRDAnalysis": "读取第一阶段生成的PRD分析文档",
+      "extractKeyElements": [
+        "业务流程关键节点",
+        "技术架构组件",
+        "数据流向路径",
+        "模块依赖关系"
+      ]
+    },
+    "flowchartMapping": {
+      "businessToFlowchart": {
+        "rule1": "将业务流程映射为流程图节点",
+        "rule2": "识别决策点和分支逻辑",
+        "rule3": "标注异常处理路径"
+      },
+      "technicalToArchitecture": {
+        "rule1": "将技术组件映射为架构图模块",
+        "rule2": "标注模块间调用关系",
+        "rule3": "显示数据流向和存储"
+      }
+    },
+    "outputFormat": {
+      "baseDirectory": "fop/.joycode/flowcharts/",
+      "fileNaming": "{requirement_name}_{type}_{timestamp}.md",
+      "mermaidWrapper": true,
+      "includeDescription": true,
+      "addMetadata": true,
+      "namingRules": {
+        "requirement_name": "从PRD分析文档中提取的需求名称，使用下划线连接",
+        "type": "流程图类型(business_process_flow, technical_architecture_flow, api_call_chain等)",
+        "timestamp": "YYYYMMDD格式的日期"
+      }
+    },
+    "inputSource": {
+      "primarySource": "fop/.joycode/prd-analysis-summary.md",
+      "description": "基于第一阶段生成的PRD分析文档进行流程图生成，避免重复访问原始链接",
+      "extractElements": [
+        "需求名称和标识",
+        "业务流程关键节点",
+        "技术架构组件",
+        "API调用链路",
+        "数据流向关系"
+      ]
+    }
+  },
+  "qualityChecks": {
+    "completeness": [
+      "所有关键业务节点已包含",
+      "技术架构组件完整",
+      "数据流向清晰"
+    ],
+    "clarity": [
+      "节点命名清晰",
+      "流向逻辑明确",
+      "分支条件明确"
+    ],
+    "consistency": [
+      "命名规范一致",
+      "图形样式统一",
+      "颜色使用规范"
+    ]
+  }
+}

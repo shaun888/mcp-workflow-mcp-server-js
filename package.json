@@ -1,0 +1,80 @@
+{
+  "name": "@jd/fop-workflow-mcp-server",
+  "version": "1.0.1",
+  "description": "FOP工作流MCP服务器 - 提供完整的FOP开发规范和指导",
+  "main": "index.js",
+  "bin": {
+    "fop-workflow-mcp": "./bin/fop-workflow-mcp.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "mvn clean package -DskipTests",
+    "dev": "mvn solon:run",
+    "test": "mvn test",
+    "publish:npm": "npm publish --registry=http://registry.m.jd.com",
+    "docker:build": "docker build -t fop-workflow-mcp:latest .",
+    "docker:run": "docker run -p 8080:8080 fop-workflow-mcp:latest"
+  },
+  "keywords": [
+    "mcp",
+    "fop",
+    "workflow",
+    "jd",
+    "ai",
+    "assistant",
+    "code-generation",
+    "prd-analysis"
+  ],
+  "author": "FOP Team <fop-team@jd.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jd-fop/workflow-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jd-fop/workflow-mcp-server/issues"
+  },
+  "homepage": "https://github.com/jd-fop/workflow-mcp-server#readme",
+  "engines": {
+    "node": ">=16.0.0",
+    "java": ">=8"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "target/",
+    "src/",
+    "pom.xml",
+    "README.md",
+    "LICENSE",
+    ".joycode/"
+  ],
+  "publishConfig": {
+    "registry": "http://registry.m.jd.com",
+    "access": "restricted"
+  },
+  "mcp": {
+    "server": {
+      "name": "fop-workflow-mcp",
+      "version": "1.0.0",
+      "description": "FOP工作流MCP服务器",
+      "command": "java",
+      "args": [
+        "-jar",
+        "target/mcp-api-1.0.jar"
+      ],
+      "env": {
+        "SERVER_PORT": "8080",
+        "MCP_ENDPOINT": "/mcp/fop-workflow"
+      }
+    }
+  }
+}

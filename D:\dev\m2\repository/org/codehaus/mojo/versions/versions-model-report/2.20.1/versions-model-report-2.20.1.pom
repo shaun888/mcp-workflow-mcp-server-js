@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.mojo.versions</groupId>
+    <artifactId>versions</artifactId>
+    <version>2.20.1</version>
+  </parent>
+
+  <artifactId>versions-model-report</artifactId>
+
+  <name>Versions Model Report</name>
+  <description>Modello models used in reports</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <models>
+            <model>src/main/mdo/dependency-updates-report.mdo</model>
+            <model>src/main/mdo/plugin-updates-report.mdo</model>
+            <model>src/main/mdo/property-updates-report.mdo</model>
+          </models>
+          <version>${modelloNamespaceReportVersion}</version>
+          <domAsXpp3>false</domAsXpp3>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generate-rule</id>
+            <goals>
+              <goal>stax-reader</goal>
+              <goal>stax-writer</goal>
+              <goal>java</goal>
+            </goals>
+            <phase>generate-sources</phase>
+          </execution>
+          <execution>
+            <id>site-doc</id>
+            <goals>
+              <goal>xdoc</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+          <execution>
+            <id>site-xsd</id>
+            <goals>
+              <goal>xsd</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-site/resources/xsd</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <!-- Lenient linter due to generated classes -->
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <doclint>all,-missing</doclint>
+          <additionalOptions>
+            <additionalOption>-quiet</additionalOption>
+          </additionalOptions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>

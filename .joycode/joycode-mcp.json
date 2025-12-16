@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "agents": {
+    "-0-90se7": {
+      "name": "柯南",
+      "description": "开发助手，专门处理链路梳理和需求分析，按照joycoderrules规范生成代码",
+      "autoLoadConfig": true,
+      "configFiles": ["fop/.joycode/fop-agent-config.json"],
+      "startup": {
+        "readConfigOnInit": true,
+        "applyRulesOnStart": true
+      }
+    }
+  },
+  "mcp": {
+    "servers": {
+      "joyspace-mcp": {
+        "enabled": true,
+        "autoConnect": true
+      },
+      "autoBots": {
+        "enabled": true,
+        "autoConnect": true
+      }
+    }
+  },
+  "hooks": {
+    "preInit": [
+      {
+        "name": "loadAgentConfig",
+        "script": "loadConfig",
+        "args": {
+          "configPath": "fop/.joycode/fop-agent-config.json",
+          "required": true
+        }
+      }
+    ],
+    "postInit": [
+      {
+        "name": "notifyConfigLoaded",
+        "script": "logMessage",
+        "args": {
+          "message": "已自动加载柯南智能体配置文件",
+          "level": "info"
+        }
+      }
+    ]
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "logDirectory": "fop/.joycode/logs",
+    "rotateDaily": true
+  }
+}

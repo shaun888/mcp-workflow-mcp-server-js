@@ -1,0 +1,78 @@
+server.port: 8080
+
+solon.app:
+  name: 'workflow-master'
+  group: 'jd-fop'
+  # 启用监控
+  monitoring:
+    enabled: true
+  # 启用健康检查端点
+  health:
+    enabled: true
+# HTTP连接和稳定性配置
+server:
+  connector:
+    # 连接超时设置
+    connectionTimeout: 30000  # 30秒
+    # Keep-alive超时
+    keepAliveTimeout: 60000   # 60秒
+    # 最大连接数
+    maxConnections: 1000
+    # 最大线程数
+    maxThreads: 200
+    # 最小空闲线程数
+    minSpareThreads: 10
+
+# MCP服务器稳定性配置
+mcp:
+  server:
+    # 连接池配置
+    connectionPool:
+      maxTotal: 100
+      maxIdle: 20
+      minIdle: 5
+      maxWaitMillis: 10000
+    # 重试配置
+    retry:
+      maxAttempts: 3
+      backoffDelay: 1000
+      maxBackoffDelay: 5000
+    # 超时配置
+    timeout:
+      connect: 10000    # 连接超时 10秒
+      read: 30000       # 读取超时 30秒
+      write: 15000      # 写入超时 15秒
+    # 健康检查
+    healthCheck:
+      enabled: true
+      interval: 30000   # 30秒检查一次
+      timeout: 5000     # 健康检查超时 5秒
+
+# 日志配置
+solon.logging:
+  appender:
+    console:
+      level: INFO
+    file:
+      level: INFO
+      # 添加MCP相关日志
+      pattern: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  logger:
+    # MCP相关日志级别
+    "com.jd.mcp": DEBUG
+    # 连接相关日志
+    "org.noear.solon.net": INFO
+    # 根日志级别
+    root: INFO
+
+# 性能监控配置
+management:
+  endpoints:
+    enabled: true
+  metrics:
+    enabled: true
+    # 连接池监控
+    connectionPool: true
+    # JVM监控
+    jvm: true
+

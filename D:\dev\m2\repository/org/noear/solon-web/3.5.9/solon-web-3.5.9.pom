@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.noear</groupId>
+        <artifactId>solon-parent</artifactId>
+        <version>3.5.9</version>
+        <relativePath>../../solon-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solon-web</artifactId>
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-lib</artifactId>
+        </dependency>
+
+        <!-- Http 启动器 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-server-smarthttp</artifactId>
+        </dependency>
+
+        <!-- Json序列化支持插件 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-serialization-snack3</artifactId>
+        </dependency>
+
+        <!-- 本地SessionSate支持插件 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-sessionstate-local</artifactId>
+        </dependency>
+
+        <!-- 静态文件支持插件 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-web-staticfiles</artifactId>
+        </dependency>
+
+        <!-- 跨域处理插件 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-web-cors</artifactId>
+        </dependency>
+
+        <!-- 参数与实体验证扩展插件 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-security-validation</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

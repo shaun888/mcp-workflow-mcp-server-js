@@ -1,0 +1,28 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (c) 2017-2020, org.smartboot. All rights reserved.
+  ~ project name: smart-http
+  ~ file name: pom.xml
+  ~ Date: 2020-01-01
+  ~ Author: sandao (zhengjunweimail@163.com)
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.noear</groupId>
+        <artifactId>smart-http-parent</artifactId>
+        <version>2.5.14-r2</version>
+    </parent>
+
+    <artifactId>smart-http-server</artifactId>
+    <name>${project.artifactId}</name>
+    <description>smart-http服务端应用</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>smart-http-common</artifactId>
+        </dependency>
+    </dependencies>
+</project>

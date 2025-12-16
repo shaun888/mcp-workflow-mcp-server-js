@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <plugins>
+    <plugin>
+      <name>Apache Maven WAR Plugin</name>
+      <prefix>war</prefix>
+      <artifactId>maven-war-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Apache Maven Source Plugin</name>
+      <prefix>source</prefix>
+      <artifactId>maven-source-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
