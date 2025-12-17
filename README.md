@@ -5,7 +5,7 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](Dockerfile)
 [![NPM](https://img.shields.io/badge/npm-published-red.svg)](https://www.npmjs.com/package/@jd/fop-workflow-mcp-server)
 
-> 专为京东FOP平台设计的MCP服务器，提供完整的开发规范指导、PRD分析、代码生成和流程图生成功能。
+> 一键使用的MCP服务器，提供完整的开发规范指导、PRD分析、代码生成和流程图生成功能。
 
 ## 🚀 快速开始
 
@@ -89,7 +89,7 @@ java -jar target/mcp-api-1.0.jar
 
 ## 🔗 MCP客户端配置
 
-### JoyCode配置示例
+### 本地调试配置示例
 
 ```json
 {
@@ -102,7 +102,7 @@ java -jar target/mcp-api-1.0.jar
 }
 ```
 
-### 其他MCP客户端
+### 直接配置MCP客户端
 
 ```json
 {
@@ -118,51 +118,6 @@ java -jar target/mcp-api-1.0.jar
   }
 }
 ```
-
-## 📖 使用指南
-
-### 基础用法
-
-```javascript
-// 获取完整工作流指导
-const guide = await mcpClient.callTool("getFopWorkflowGuide", {});
-
-// 获取特定规范
-const prdRules = await mcpClient.callTool("getFopWorkflowGuide", {
-  workflowType: "prd_analysis"
-});
-
-const codeRules = await mcpClient.callTool("getFopWorkflowGuide", {
-  workflowType: "code_generation"
-});
-```
-
-### 高级配置
-
-#### 环境变量
-
-```bash
-# 服务器配置
-SERVER_PORT=8080
-SERVER_HOST=localhost
-
-# JVM配置
-JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC"
-
-# 时区设置
-TZ=Asia/Shanghai
-```
-
-#### 自定义端口
-
-```bash
-# NPM包方式
-fop-workflow-mcp --port 9090
-
-# Docker方式
-docker run -p 9090:8080 -e SERVER_PORT=8080 fop-workflow-mcp:latest
-```
-
 ## 🏗️ 架构设计
 
 ```mermaid
@@ -216,24 +171,6 @@ fop-workflow-mcp-server/
 └── README.md                          # 项目文档
 ```
 
-### 本地开发
-
-```bash
-# 安装开发依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建项目
-npm run build
-
-# 运行测试
-npm test
-
-# 发布到NPM
-npm run publish:npm
-```
 
 ### 添加新功能
 
@@ -355,10 +292,8 @@ A: 在 `.joycode/rules/` 目录下添加JSON规范文件
 
 ### 技术支持
 
-- 📧 邮箱: wanghanxiong1@jd.com
-- 🐛 问题反馈: [GitHub Issues](https://github.com/workflow-mcp-server/issues)
-- 📖 文档: [项目Wiki](https://github.com/workflow-mcp-server/wiki)
-
+- 📧 邮箱: wanghanxiong1@jd.com/sa549236986@163.com
+- 🐛 问题反馈:微信: nixionggeaa
 ---
 
 **🎉 感谢使用 FOP工作流MCP服务器！**
