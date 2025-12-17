@@ -1,10 +1,10 @@
 {
   "name": "@jd/fop-workflow-mcp-server",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "FOP工作流MCP服务器 - 提供完整的FOP开发规范和指导",
   "main": "index.js",
   "bin": {
-    "fop-workflow-mcp": "./bin/fop-workflow-mcp.js"
+    "fop-workflow-mcp": "bin/fop-workflow-mcp.js"
   },
   "scripts": {
     "start": "node index.js",
@@ -27,14 +27,6 @@
   ],
   "author": "FOP Team <fop-team@jd.com>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jd-fop/workflow-mcp-server.git"
-  },
-  "bugs": {
-    "url": "https://github.com/jd-fop/workflow-mcp-server/issues"
-  },
-  "homepage": "https://github.com/jd-fop/workflow-mcp-server#readme",
   "engines": {
     "node": ">=16.0.0",
     "java": ">=8"
@@ -64,12 +56,11 @@
   "mcp": {
     "server": {
       "name": "fop-workflow-mcp",
-      "version": "1.0.0",
+      "version": "latest",
       "description": "FOP工作流MCP服务器",
-      "command": "java",
+      "command": "npx",
       "args": [
-        "-jar",
-        "target/mcp-api-1.0.jar"
+        "@jd/fop-workflow-mcp-server@latest"
       ],
       "env": {
         "SERVER_PORT": "8080",

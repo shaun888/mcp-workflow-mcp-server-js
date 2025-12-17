@@ -6,24 +6,43 @@ const chalk = require('chalk');
 const path = require('path');
 const fs = require('fs');
 
+// 简化且精准的错误处理
+function findJarFile(packageRoot) {
+  const jarPath = path.join(packageRoot, 'target', 'mcp-api.jar');
+  
+  if (fs.existsSync(jarPath)) {
+    return jarPath;
+  }
+  
+  return null;
+}
+
+// 精准错误信息输出
+function showErrorAndExit(message, details = '') {
+  console.error(chalk.red(`❌ ${message}`));
+  if (details) {
+    console.error(chalk.yellow(`💡 ${details}`));
+  }
+  process.exit(1);
+}
+
 const program = new Command();
 
 program
   .name('fop-workflow-mcp')
-  .description('FOP工作流MCP服务器 - 提供完整的FOP开发规范和指导')
-  .version('1.0.0');
+  .description('FOP工作流MCP服务器')
+  .version('1.0.4');
 
 program
   .option('-p, --port <port>', '服务器端口', '8080')
   .option('-h, --host <host>', '服务器主机', 'localhost')
   .option('--build', '构建项目后启动')
   .option('--dev', '开发模式启动')
-  .option('--verbose', '详细输出')
   .action((options) => {
-    console.log(chalk.blue.bold('🚀 启动 FOP工作流MCP服务器...'));
+    console.log(chalk.blue('🚀 启动FOP工作流MCP服务器...'));
     
     const packageRoot = path.dirname(__dirname);
-    const jarPath = path.join(packageRoot, 'target', 'mcp-api-1.0.jar');
+    const jarPath = findJarFile(packageRoot);
     
     // 设置环境变量
     process.env.SERVER_PORT = options.port;
@@ -33,16 +52,19 @@ program
       console.log(chalk.yellow('📦 构建项目...'));
       const buildProcess = spawn('mvn', ['clean', 'package', '-DskipTests'], {
         cwd: packageRoot,
-        stdio: options.verbose ? 'inherit' : 'pipe'
+        stdio: 'inherit'
       });
       
       buildProcess.on('close', (code) => {
         if (code === 0) {
-          console.log(chalk.green('✅ 构建成功'));
-          startServer(jarPath, options);
+          const newJarPath = findJarFile(packageRoot);
+          if (newJarPath) {
+            startServer(newJarPath, options);
+          } else {
+            showErrorAndExit('构建成功但找不到JAR文件', '检查target/mcp-api.jar是否存在');
+          }
         } else {
-          console.error(chalk.red('❌ 构建失败'));
-          process.exit(1);
+          showErrorAndExit('Maven构建失败', `退出码: ${code}`);
         }
       });
     } else if (options.dev) {
@@ -56,18 +78,15 @@ program
         process.exit(code);
       });
     } else {
-      // 检查JAR文件是否存在
-      if (!fs.existsSync(jarPath)) {
-        console.error(chalk.red('❌ JAR文件不存在，请先运行构建: fop-workflow-mcp --build'));
-        process.exit(1);
+      if (!jarPath) {
+        showErrorAndExit('找不到JAR文件', '运行: fop-workflow-mcp --build 或检查target/mcp-api.jar');
       }
-      
       startServer(jarPath, options);
     }
   });
 
 function startServer(jarPath, options) {
-  console.log(chalk.green(`🌟 启动服务器在 http://${options.host}:${options.port}`));
+  console.log(chalk.green(`🌟 启动服务器: http://${options.host}:${options.port}`));
   console.log(chalk.cyan(`📡 MCP端点: http://${options.host}:${options.port}/mcp/fop-workflow`));
   
   const javaProcess = spawn('java', [
@@ -80,14 +99,14 @@ function startServer(jarPath, options) {
   
   javaProcess.on('close', (code) => {
     if (code !== 0) {
-      console.error(chalk.red(`❌ 服务器退出，代码: ${code}`));
+      showErrorAndExit(`Java进程异常退出`, `退出码: ${code}`);
     }
     process.exit(code);
   });
   
   // 优雅关闭
   process.on('SIGINT', () => {
-    console.log(chalk.yellow('\n🛑 正在关闭服务器...'));
+    console.log(chalk.yellow('\n🛑 关闭服务器...'));
     javaProcess.kill('SIGTERM');
   });
   
@@ -96,71 +115,55 @@ function startServer(jarPath, options) {
   });
 }
 
-// 添加配置命令
+// 简化配置命令
 program
   .command('config')
-  .description('生成MCP客户端配置')
-  .option('-o, --output <file>', '输出文件路径', 'mcp-config.json')
-  .option('-p, --port <port>', '服务器端口', '8080')
-  .option('-h, --host <host>', '服务器主机', 'localhost')
+  .description('生成MCP配置')
+  .option('-o, --output <file>', '输出文件', 'mcp-config.json')
+  .option('-p, --port <port>', '端口', '8080')
+  .option('-h, --host <host>', '主机', 'localhost')
   .action((options) => {
     const config = {
       "fop-workflow-mcp": {
         "url": `http://${options.host}:${options.port}/mcp/fop-workflow`,
-        "autoApprove": [
-          "getFopWorkflowGuide"
-        ]
+        "autoApprove": ["getFopWorkflowGuide"]
       }
     };
     
     fs.writeFileSync(options.output, JSON.stringify(config, null, 2));
-    console.log(chalk.green(`✅ 配置文件已生成: ${options.output}`));
-    console.log(chalk.cyan('📋 请将此配置添加到你的MCP客户端配置中'));
+    console.log(chalk.green(`✅ 配置已生成: ${options.output}`));
   });
 
-// 添加健康检查命令
+// 简化健康检查
 program
   .command('health')
-  .description('检查服务器健康状态')
-  .option('-p, --port <port>', '服务器端口', '8080')
-  .option('-h, --host <host>', '服务器主机', 'localhost')
+  .description('检查服务状态')
+  .option('-p, --port <port>', '端口', '8080')
+  .option('-h, --host <host>', '主机', 'localhost')
   .action(async (options) => {
     const http = require('http');
-    
     const healthUrl = `http://${options.host}:${options.port}/actuator/health`;
     
-    console.log(chalk.blue(`🔍 检查服务器健康状态: ${healthUrl}`));
+    console.log(chalk.blue(`🔍 检查: ${healthUrl}`));
     
     const req = http.get(healthUrl, (res) => {
       let data = '';
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
+      res.on('data', chunk => data += chunk);
       res.on('end', () => {
         if (res.statusCode === 200) {
-          console.log(chalk.green('✅ 服务器健康状态良好'));
-          try {
-            const health = JSON.parse(data);
-            console.log(chalk.cyan('📊 健康信息:'), health);
-          } catch (e) {
-            console.log(chalk.cyan('📊 响应:'), data);
-          }
+          console.log(chalk.green('✅ 服务正常'));
         } else {
-          console.log(chalk.yellow(`⚠️  服务器响应状态码: ${res.statusCode}`));
-          console.log(chalk.cyan('📊 响应:'), data);
+          console.log(chalk.yellow(`⚠️ 状态码: ${res.statusCode}`));
         }
       });
     });
     
-    req.on('error', (err) => {
-      console.error(chalk.red('❌ 无法连接到服务器:'), err.message);
-      console.log(chalk.yellow('💡 提示: 确保服务器正在运行'));
+    req.on('error', err => {
+      showErrorAndExit('连接失败', err.message);
     });
     
     req.setTimeout(5000, () => {
-      console.error(chalk.red('❌ 连接超时'));
-      req.destroy();
+      showErrorAndExit('连接超时', '检查服务是否启动');
     });
   });
 
