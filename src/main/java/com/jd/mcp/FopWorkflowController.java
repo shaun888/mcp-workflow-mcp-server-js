@@ -41,29 +41,29 @@ public class FopWorkflowController {
 
         try {
             JsonNode config = loadWorkflowConfig();
-            
+
             Map<String, Object> guide = new HashMap<>();
             guide.put("guide_name", "FOP工作流规范指导");
             guide.put("version", "3.0.0");
             guide.put("description", "提供完整的FOP开发工作流规范，供AI模型参考生成");
             guide.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            
+
             // 根据workflowType参数返回相应内容
             if (workflowType == null || workflowType.isEmpty()) {
                 // 返回完整指导和导航菜单
                 guide.put("workflow_config", config);
                 guide.put("usage_instruction", "这是FOP工作流的主入口，请按照以下顺序使用各个规范");
-                
+
                 // 添加导航指引
                 Map<String, Object> navigation = new HashMap<>();
                 navigation.put("recommended_order", Arrays.asList(
-                    "1. 首先阅读完整工作流配置（当前返回内容）",
-                    "2. 如需PRD分析规范，使用参数 workflowType=prd_analysis",
-                    "3. 如需代码生成规范，使用参数 workflowType=code_generation",
-                    "4. 如需流程图生成规范，使用参数 workflowType=flowchart_generation",
-                    "5. 如需智能检索策略，使用参数 workflowType=intelligent_retrieval"
+                        "1. 首先阅读完整工作流配置（当前返回内容）",
+                        "2. 如需PRD分析规范，使用参数 workflowType=prd_analysis",
+                        "3. 如需代码生成规范，使用参数 workflowType=code_generation",
+                        "4. 如需流程图生成规范，使用参数 workflowType=flowchart_generation",
+                        "5. 如需智能检索策略，使用参数 workflowType=intelligent_retrieval"
                 ));
-                
+
                 Map<String, String> availableTools = new HashMap<>();
                 availableTools.put("getPrdAnalysisRules", "【细分工具】获取PRD分析规范");
                 availableTools.put("getCodeGenerationRules", "【细分工具】获取代码生成规范");
@@ -71,12 +71,12 @@ public class FopWorkflowController {
                 availableTools.put("getIntelligentRetrievalStrategy", "【细分工具】获取智能检索优化策略");
                 availableTools.put("getWorkflowConfig", "【细分工具】获取工作流配置信息");
                 availableTools.put("getCodeAnalysisGuidance", "【细分工具】获取代码分析指导规范");
-                
+
                 navigation.put("available_detailed_tools", availableTools);
                 navigation.put("note", "建议优先使用本主入口工具，通过参数获取具体规范，而非直接调用细分工具");
-                
+
                 guide.put("navigation_guide", navigation);
-                
+
             } else {
                 // 根据参数返回具体规范内容
                 switch (workflowType.toLowerCase()) {
@@ -252,11 +252,11 @@ public class FopWorkflowController {
             errorResponse.put("title", title);
             errorResponse.put("message", message);
             errorResponse.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            
+
             if (exception != null) {
                 errorResponse.put("exception_type", exception.getClass().getSimpleName());
             }
-            
+
             return objectMapper.writeValueAsString(errorResponse);
         } catch (Exception e) {
             return "{\"error\": true, \"message\": \"" + message + "\"}";

@@ -14,7 +14,7 @@
     <groupId>com.jd</groupId>
     <artifactId>mcp-api</artifactId>
     <version>1.0.1</version>
-    
+
     <packaging>jar</packaging>
 
     <description>a mcp server </description>
@@ -28,33 +28,33 @@
             <groupId>org.noear</groupId>
             <artifactId>solon-web</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-ai</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-ai-mcp</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-ai-flow</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-logging-logback</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- Jackson JSON处理 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -68,7 +68,7 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.14</version>
         </dependency>
-        
+
         <!-- JSoup HTML解析 -->
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -81,11 +81,11 @@
             <artifactId>solon-test</artifactId>
             <scope>test</scope>
         </dependency>
-    <dependency>
-        <groupId>org.noear</groupId>
-        <artifactId>solon-configuration-processor</artifactId>
-        <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-configuration-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
@@ -107,7 +107,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            
+
             <!-- Solon 应用程序打包插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -131,7 +131,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <!-- 插件仓库配置，确保插件也使用HTTPS -->
     <pluginRepositories>
         <pluginRepository>
@@ -152,27 +152,27 @@
 
     <repositories>
         <repository>
-   <id>tencent</id>
-   <url>https://mirrors.cloud.tencent.com/nexus/repository/maven-public/</url>
-   <snapshots>
-    <enabled>false</enabled>
-   </snapshots>
-  </repository>
-  <!-- 覆盖parent中的HTTP仓库，使用HTTPS镜像 -->
-  <repository>
-   <id>central</id>
-   <url>https://repo1.maven.org/maven2</url>
-   <snapshots>
-    <enabled>false</enabled>
-   </snapshots>
-  </repository>
-  <repository>
-   <id>jd-artifactory-https</id>
-   <url>https://artifactory.jd.com/libs-releases</url>
-   <snapshots>
-    <enabled>false</enabled>
-   </snapshots>
-  </repository>
+            <id>tencent</id>
+            <url>https://mirrors.cloud.tencent.com/nexus/repository/maven-public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- 覆盖parent中的HTTP仓库，使用HTTPS镜像 -->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jd-artifactory-https</id>
+            <url>https://artifactory.jd.com/libs-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
 </project>

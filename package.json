@@ -1,19 +1,14 @@
 {
   "name": "@jd/fop-workflow-mcp-server",
-  "version": "1.0.4",
-  "description": "FOP工作流MCP服务器 - 提供完整的FOP开发规范和指导",
-  "main": "index.js",
+  "version": "1.0.7",
+  "description": "FOP智能工作流MCP服务器 - 自主处理PRD分析、代码生成、流程图生成",
+  "main": "server.js",
   "bin": {
-    "fop-workflow-mcp": "bin/fop-workflow-mcp.js"
+    "fop-workflow-mcp": "server.js"
   },
   "scripts": {
-    "start": "node index.js",
-    "build": "mvn clean package -DskipTests",
-    "dev": "mvn solon:run",
-    "test": "mvn test",
-    "publish:npm": "npm publish --registry=http://registry.m.jd.com",
-    "docker:build": "docker build -t fop-workflow-mcp:latest .",
-    "docker:run": "docker run -p 8080:8080 fop-workflow-mcp:latest"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [
     "mcp",
@@ -23,49 +18,26 @@
     "ai",
     "assistant",
     "code-generation",
-    "prd-analysis"
+    "prd-analysis",
+    "intelligent",
+    "autonomous"
   ],
-  "author": "FOP Team <fop-team@jd.com>",
+  "author": "FOP Team",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0",
-    "java": ">=8"
+    "node": ">=16.0.0"
   },
   "dependencies": {
-    "cross-spawn": "^7.0.3",
-    "commander": "^11.0.0",
-    "chalk": "^4.1.2"
+    "@modelcontextprotocol/sdk": "^1.25.0",
+    "axios": "^1.6.0"
   },
-  "devDependencies": {
-    "jest": "^29.0.0"
-  },
-  "files": [
-    "bin/",
-    "lib/",
-    "target/",
-    "src/",
-    "pom.xml",
-    "README.md",
-    "LICENSE",
-    ".joycode/"
-  ],
   "publishConfig": {
     "registry": "http://registry.m.jd.com",
     "access": "restricted"
   },
-  "mcp": {
-    "server": {
-      "name": "fop-workflow-mcp",
-      "version": "latest",
-      "description": "FOP工作流MCP服务器",
-      "command": "npx",
-      "args": [
-        "@jd/fop-workflow-mcp-server@latest"
-      ],
-      "env": {
-        "SERVER_PORT": "8080",
-        "MCP_ENDPOINT": "/mcp/fop-workflow"
-      }
-    }
-  }
+  "files": [
+    "server.js",
+    "package.json",
+    "src/"
+  ]
 }
