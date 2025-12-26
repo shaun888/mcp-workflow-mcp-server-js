@@ -1,14 +1,17 @@
 {
   "name": "@jd/fop-workflow-mcp-server",
-  "version": "1.0.7",
-  "description": "FOP智能工作流MCP服务器 - 自主处理PRD分析、代码生成、流程图生成",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "JoyCode MCP服务器 - 专业版，基于标准MCP SDK，解决连接超时问题",
+  "main": "index.js",
   "bin": {
-    "fop-workflow-mcp": "server.js"
+    "joycode-mcp": "index.js"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node index.js",
+    "dev": "node index.js",
+    "final": "node joycode-mcp-final.js",
+    "old": "node joycode-mcp.js",
+    "test": "node index.js"
   },
   "keywords": [
     "mcp",
@@ -20,7 +23,9 @@
     "code-generation",
     "prd-analysis",
     "intelligent",
-    "autonomous"
+    "autonomous",
+    "dynamic-config",
+    "hot-reload"
   ],
   "author": "FOP Team",
   "license": "MIT",
@@ -36,8 +41,10 @@
     "access": "restricted"
   },
   "files": [
-    "server.js",
+    "index.js",
     "package.json",
-    "src/"
+    "fop/",
+    "joycode-mcp-final.js",
+    "joycode-mcp.js"
   ]
 }
