@@ -1,0 +1,44 @@
+{
+  "preset": "standard",
+  "description": "用户规则配置 - 标准配置",
+  "lastUpdated": "2025-09-10",
+  "enabledRules": {
+    "prdAnalysis": {
+      "templateContentFilter": true,
+      "navigationOptimization": true,
+      "fopSpecificAnalysis": true,
+      "speedOptimization": true
+    },
+    "codeGeneration": {
+      "intelligentRetrieval": true,
+      "existingCodeAnalysis": true,
+      "businessCodeIdentification": true,
+      "modificationPointIdentification": true,
+      "codeModificationPlan": true,
+      "codeStandards": true,
+      "qualityAssurance": true
+    },
+    "flowchartGeneration": {
+      "businessFlowchart": true,
+      "technicalArchitecture": true,
+      "sequenceDiagram": true,
+      "apiCallChain": true,
+      "dataFlowDiagram": false
+    },
+    "codeReview": {
+      "codeQuality": true,
+      "securityCheck": true,
+      "performanceCheck": true,
+      "exceptionHandling": true,
+      "businessLogic": true,
+      "architectureCompliance": true
+    },
+    "outputVerification": {
+      "fileExistenceCheck": true,
+      "contentCompletenessCheck": true,
+      "formatComplianceCheck": true,
+      "dependencyCheck": true,
+      "generateVerificationReport": true
+    }
+  }
+}

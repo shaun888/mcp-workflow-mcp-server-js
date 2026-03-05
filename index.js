@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 /**
- * JoyCode MCP服务器 - 发布版 v2.0.0
+ * JoyCode MCP服务器 - 发布版 v4.0.0
  * 一键安装形态：npx -y --registry=http://registry.m.jd.com @jd/fop-workflow-mcp-server
+ * 
+ * 新增功能：
+ * - 代码生成增强流程（分析现有代码→识别修改位置→生成方案→实施修改）
+ * - 流程图/时序图输出功能
+ * - 代码评审规则
+ * - 用户可选规则功能
+ * - 文件输出验证机制
  */
 
 const { Server } = require('@modelcontextprotocol/sdk/server/index.js');
@@ -20,12 +27,25 @@ class JoyCodeMCPServer {
     this.config = null;
     this.configPath = path.join(__dirname, 'fop', '.joycode', 'fop-agent-config.json');
     this.rulesPath = path.join(__dirname, 'fop', '.joycode', 'rules');
+    this.userConfigPath = path.join(__dirname, 'fop', '.joycode', 'config', 'user-rules-config.json');
+    
+    // 输出目录配置
+    this.outputDirectories = {
+      analysis: path.join(__dirname, 'fop', '.joycode'),
+      generatedCode: path.join(__dirname, 'fop', '.joycode', 'generated-code'),
+      flowcharts: path.join(__dirname, 'fop', '.joycode', 'flowcharts'),
+      logs: path.join(__dirname, 'fop', '.joycode', 'logs'),
+      reports: path.join(__dirname, 'fop', '.joycode', 'reports'),
+      plans: path.join(__dirname, 'fop', '.joycode', 'plans'),
+      implementationSummary: path.join(__dirname, 'fop', '.joycode', 'implementation-summary'),
+      config: path.join(__dirname, 'fop', '.joycode', 'config')
+    };
     
     // 初始化MCP服务器
     this.server = new Server(
       {
-        name: 'joycode-mcp',
-        version: '2.0.0',
+        name: 'fop-workflow-mcp-server',
+        version: '4.0.0',
       },
       {
         capabilities: {
@@ -39,9 +59,9 @@ class JoyCodeMCPServer {
     this.setupErrorHandlers();
   }
 
-  // 设置工具处理器 - 完整保留原有工作流逻辑
+  // 设置工具处理器 - 包含所有功能
   setupToolHandlers() {
-    // 工具列表 - 包含所有原有功能
+    // 工具列表 - 包含所有功能
     this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
       tools: [
         {
@@ -54,14 +74,14 @@ class JoyCodeMCPServer {
         },
         {
           name: 'get_workflow_config',
-          description: '获取工作流配置 - 支持stage1/2/3阶段',
+          description: '获取工作流配置 - 支持stage1/2/3/4/5阶段',
           inputSchema: {
             type: 'object',
             properties: {
               stage: { 
                 type: 'string', 
                 description: '工作流阶段名称',
-                enum: ['stage1_prd_analysis', 'stage2_code_generation', 'stage3_flowchart_generation']
+                enum: ['stage1_prd_analysis', 'stage2_code_generation', 'stage3_flowchart_generation', 'stage4_code_review', 'stage5_final_verification']
               },
             },
           },
@@ -84,14 +104,14 @@ class JoyCodeMCPServer {
         },
         {
           name: 'execute_workflow_stage',
-          description: '执行工作流阶段 - 完整执行PRD分析/代码生成/流程图生成',
+          description: '执行工作流阶段 - 完整执行PRD分析/代码生成/流程图生成/代码评审/最终验证',
           inputSchema: {
             type: 'object',
             properties: {
               stage: { 
                 type: 'string', 
                 description: '要执行的工作流阶段',
-                enum: ['stage1_prd_analysis', 'stage2_code_generation', 'stage3_flowchart_generation'],
+                enum: ['stage1_prd_analysis', 'stage2_code_generation', 'stage3_flowchart_generation', 'stage4_code_review', 'stage5_final_verification'],
                 required: true
               },
               input_data: {
@@ -99,7 +119,10 @@ class JoyCodeMCPServer {
                 description: '阶段输入数据',
                 properties: {
                   prd_url: { type: 'string', description: 'PRD文档URL' },
-                  analysis_file: { type: 'string', description: '分析结果文件路径' }
+                  analysis_file: { type: 'string', description: '分析结果文件路径' },
+                  requirement_name: { type: 'string', description: '需求名称' },
+                  code_files: { type: 'array', items: { type: 'string' }, description: '代码文件列表' },
+                  user_rules: { type: 'object', description: '用户自定义规则配置' }
                 }
               }
             },
@@ -116,15 +139,116 @@ class JoyCodeMCPServer {
               file_type: { 
                 type: 'string', 
                 description: '文件类型',
-                enum: ['prd_analysis', 'code', 'flowchart', 'log']
+                enum: ['prd_analysis', 'code', 'flowchart', 'sequence_diagram', 'code_review_report', 'verification_report', 'log', 'plan', 'analysis']
               }
             },
+          },
+        },
+        {
+          name: 'get_enhanced_code_workflow',
+          description: '获取增强的代码生成工作流 - 包含代码分析、识别修改位置、生成方案、实施修改步骤',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              step: {
+                type: 'string',
+                description: '工作流步骤',
+                enum: ['step1_existingCodeAnalysis', 'step2_businessCodeIdentification', 'step3_modificationPointIdentification', 'step4_codeModificationPlan', 'step5_codeImplementation']
+              }
+            },
+          },
+        },
+        {
+          name: 'get_flowchart_types',
+          description: '获取流程图类型配置 - 业务流程图、技术架构图、时序图等',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'get_code_review_categories',
+          description: '获取代码评审类别 - 代码质量、安全检查、性能检查等',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'get_user_selectable_rules',
+          description: '获取用户可选规则 - 查看所有可选规则和预设配置',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              category: {
+                type: 'string',
+                description: '规则类别（可选）',
+                enum: ['prdAnalysis', 'codeGeneration', 'flowchartGeneration', 'codeReview', 'outputVerification', 'all']
+              }
+            },
+          },
+        },
+        {
+          name: 'set_user_rules',
+          description: '设置用户自定义规则 - 启用或禁用特定规则',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              preset: {
+                type: 'string',
+                description: '预设配置名称',
+                enum: ['minimal', 'standard', 'complete', 'development']
+              },
+              custom_rules: {
+                type: 'object',
+                description: '自定义规则配置'
+              }
+            },
+          },
+        },
+        {
+          name: 'verify_output_files',
+          description: '验证输出文件 - 检查所有必需文件是否正确生成',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              requirement_name: { type: 'string', description: '需求名称' },
+              check_types: {
+                type: 'array',
+                items: { type: 'string' },
+                description: '要检查的文件类型'
+              }
+            },
+          },
+        },
+        {
+          name: 'get_output_directories',
+          description: '获取输出目录配置 - 返回所有输出目录路径',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'ensure_output_directories',
+          description: '确保输出目录存在 - 创建所有必需的输出目录',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'get_execution_sequence',
+          description: '获取执行顺序 - 返回工作流执行顺序和依赖关系',
+          inputSchema: {
+            type: 'object',
+            properties: {},
           },
         }
       ],
     }));
 
-    // 工具调用处理 - 完整实现原有逻辑
+    // 工具调用处理 - 完整实现所有功能
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
 
@@ -147,6 +271,33 @@ class JoyCodeMCPServer {
           
           case 'get_file_naming_rules':
             return await this.handleGetFileNamingRules(args);
+          
+          case 'get_enhanced_code_workflow':
+            return await this.handleGetEnhancedCodeWorkflow(args);
+          
+          case 'get_flowchart_types':
+            return await this.handleGetFlowchartTypes();
+          
+          case 'get_code_review_categories':
+            return await this.handleGetCodeReviewCategories();
+          
+          case 'get_user_selectable_rules':
+            return await this.handleGetUserSelectableRules(args);
+          
+          case 'set_user_rules':
+            return await this.handleSetUserRules(args);
+          
+          case 'verify_output_files':
+            return await this.handleVerifyOutputFiles(args);
+          
+          case 'get_output_directories':
+            return await this.handleGetOutputDirectories();
+          
+          case 'ensure_output_directories':
+            return await this.handleEnsureOutputDirectories();
+          
+          case 'get_execution_sequence':
+            return await this.handleGetExecutionSequence();
           
           default:
             throw new McpError(
@@ -202,7 +353,8 @@ class JoyCodeMCPServer {
         workflowStages: Object.keys(this.config.workflowConfig || {}),
         workflowCount: Object.keys(this.config.workflowConfig || {}).length,
         smartRetrievalEnabled: this.config.smartRetrievalConfig?.enabled || false,
-        executionSequence: this.config.executionSequence || {}
+        executionSequence: this.config.executionSequence || {},
+        userSelectableRulesEnabled: this.config.userSelectableRules?.enabled || false
       };
 
       console.error('✅ 配置文件加载成功');
@@ -219,7 +371,7 @@ class JoyCodeMCPServer {
     }
   }
 
-  // 获取工作流配置 - 完全保留原有逻辑
+  // 获取工作流配置 - 支持新的阶段
   async handleGetWorkflowConfig(args) {
     if (!this.config) {
       await this.handleLoadConfig();
@@ -254,7 +406,7 @@ class JoyCodeMCPServer {
     };
   }
 
-  // 显示配置摘要 - 完全保留原有逻辑
+  // 显示配置摘要 - 包含新功能
   async handleShowConfigSummary() {
     if (!this.config) {
       await this.handleLoadConfig();
@@ -269,7 +421,10 @@ class JoyCodeMCPServer {
       smartRetrieval: this.config.smartRetrievalConfig || {},
       executionSequence: this.config.executionSequence || {},
       fileNamingRules: this.config.fileNamingRules || {},
-      optimizationRules: this.config.optimizationRules || {}
+      optimizationRules: this.config.optimizationRules || {},
+      userSelectableRules: this.config.userSelectableRules || {},
+      coreCapabilities: this.config.coreCapabilities || {},
+      outputDirectories: this.outputDirectories
     };
 
     return {
@@ -282,7 +437,7 @@ class JoyCodeMCPServer {
     };
   }
 
-  // 获取智能检索配置 - 完全保留原有逻辑
+  // 获取智能检索配置
   async handleGetSmartRetrievalConfig() {
     if (!this.config) {
       await this.handleLoadConfig();
@@ -300,7 +455,7 @@ class JoyCodeMCPServer {
     };
   }
 
-  // 执行工作流阶段 - 模拟原有工作流执行逻辑
+  // 执行工作流阶段 - 增强版本
   async handleExecuteWorkflowStage(args) {
     if (!this.config) {
       await this.handleLoadConfig();
@@ -320,17 +475,24 @@ class JoyCodeMCPServer {
       throw new Error(`工作流阶段不存在: ${stage}`);
     }
 
-    // 模拟工作流执行
+    // 确保输出目录存在
+    await this.ensureDirectoriesExist();
+
+    // 生成文件名
+    const requirementName = input_data?.requirement_name || '未知需求';
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    
+    // 根据阶段生成不同的输出信息
     const executionResult = {
       stage: stage,
       name: stageConfig.name,
       status: 'success',
       timestamp: new Date().toISOString(),
       input_data: input_data,
-      output_location: stageConfig.output?.location || 'fop/.joycode/',
-      output_filename: this.generateFilename(stage, input_data),
       process_steps: stageConfig.process || [],
-      rules_file: stageConfig.rulesFile || '无'
+      rules_file: stageConfig.rulesFile || '无',
+      output: this.generateOutputInfo(stage, requirementName, timestamp),
+      verification: stageConfig.verification || {}
     };
 
     return {
@@ -343,7 +505,65 @@ class JoyCodeMCPServer {
     };
   }
 
-  // 获取文件命名规则 - 按照FOP规范
+  // 生成输出信息
+  generateOutputInfo(stage, requirementName, timestamp) {
+    const outputInfo = {
+      location: '',
+      filename: '',
+      requiredFiles: []
+    };
+
+    switch (stage) {
+      case 'stage1_prd_analysis':
+        outputInfo.location = this.outputDirectories.analysis;
+        outputInfo.filename = `${requirementName}-prd-analysis-summary.md`;
+        outputInfo.requiredFiles = [
+          { type: 'prd_analysis', path: `${outputInfo.location}/${outputInfo.filename}`, required: true }
+        ];
+        break;
+      
+      case 'stage2_code_generation':
+        outputInfo.location = this.outputDirectories.generatedCode;
+        outputInfo.filename = `${requirementName}-{模块类型}-${timestamp}.java`;
+        outputInfo.requiredFiles = [
+          { type: 'code_structure_analysis', path: `${this.outputDirectories.analysis}/${requirementName}-code-structure-analysis-${timestamp}.md`, required: false },
+          { type: 'business_code_identification', path: `${this.outputDirectories.analysis}/${requirementName}-business-code-identification-${timestamp}.md`, required: false },
+          { type: 'modification_points', path: `${this.outputDirectories.analysis}/${requirementName}-modification-points-${timestamp}.md`, required: false },
+          { type: 'code_modification_plan', path: `${this.outputDirectories.plans}/${requirementName}-code-modification-plan-${timestamp}.md`, required: false },
+          { type: 'generated_code', path: `${outputInfo.location}/${outputInfo.filename}`, required: true }
+        ];
+        break;
+      
+      case 'stage3_flowchart_generation':
+        outputInfo.location = this.outputDirectories.flowcharts;
+        outputInfo.requiredFiles = [
+          { type: 'business_flow', path: `${outputInfo.location}/${requirementName}-business-flow-${timestamp}.md`, required: true },
+          { type: 'technical_architecture', path: `${outputInfo.location}/${requirementName}-technical-architecture-${timestamp}.md`, required: true },
+          { type: 'sequence_diagram', path: `${outputInfo.location}/${requirementName}-sequence-diagram-${timestamp}.md`, required: true }
+        ];
+        break;
+      
+      case 'stage4_code_review':
+        outputInfo.location = this.outputDirectories.reports;
+        outputInfo.filename = `${requirementName}-code-review-report-${timestamp}.md`;
+        outputInfo.requiredFiles = [
+          { type: 'code_review_report', path: `${outputInfo.location}/${outputInfo.filename}`, required: true }
+        ];
+        break;
+      
+      case 'stage5_final_verification':
+        outputInfo.location = this.outputDirectories.reports;
+        outputInfo.filename = `${requirementName}-output-verification-report-${timestamp}.md`;
+        outputInfo.requiredFiles = [
+          { type: 'verification_report', path: `${outputInfo.location}/${outputInfo.filename}`, required: true }
+        ];
+        break;
+    }
+
+    return outputInfo;
+  }
+
+  // 获取文件命名规则
   async handleGetFileNamingRules(args) {
     if (!this.config) {
       await this.handleLoadConfig();
@@ -373,24 +593,303 @@ class JoyCodeMCPServer {
     };
   }
 
-  // 生成文件名辅助函数
-  generateFilename(stage, input_data) {
-    const requirementName = input_data?.requirement_name || '未知需求';
-    const stageMap = {
-      'stage1_prd_analysis': 'prd-analysis',
-      'stage2_code_generation': 'code',
-      'stage3_flowchart_generation': 'flowchart'
+  // 获取增强的代码生成工作流
+  async handleGetEnhancedCodeWorkflow(args) {
+    if (!this.config) {
+      await this.handleLoadConfig();
+    }
+
+    const stage2Config = this.config.workflowConfig?.stage2_code_generation || {};
+    const enhancedWorkflow = stage2Config.enhancedWorkflow || {};
+    const step = args?.step;
+
+    if (step) {
+      const stepConfig = enhancedWorkflow.steps?.[step] || null;
+      if (!stepConfig) {
+        throw new Error(`工作流步骤不存在: ${step}`);
+      }
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `代码生成工作流步骤 (${step}):\n${JSON.stringify(stepConfig, null, 2)}`,
+          },
+        ],
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `增强的代码生成工作流:\n${JSON.stringify(enhancedWorkflow, null, 2)}`,
+        },
+      ],
     };
-    const fileType = stageMap[stage] || 'unknown';
-    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  }
+
+  // 获取流程图类型配置
+  async handleGetFlowchartTypes() {
+    if (!this.config) {
+      await this.handleLoadConfig();
+    }
+
+    const stage3Config = this.config.workflowConfig?.stage3_flowchart_generation || {};
+    const flowchartTypes = stage3Config.flowchartTypes || {};
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `流程图类型配置:\n${JSON.stringify(flowchartTypes, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 获取代码评审类别
+  async handleGetCodeReviewCategories() {
+    if (!this.config) {
+      await this.handleLoadConfig();
+    }
+
+    const stage4Config = this.config.workflowConfig?.stage4_code_review || {};
+    const reviewCategories = stage4Config.reviewCategories || {};
+
+    // 加载代码评审规则文件
+    const reviewRulesPath = path.join(this.rulesPath, 'code-review-rules.json');
+    let reviewRules = {};
     
-    return `${requirementName}-${fileType}-${timestamp}`;
+    if (fs.existsSync(reviewRulesPath)) {
+      const reviewRulesData = fs.readFileSync(reviewRulesPath, 'utf8');
+      reviewRules = JSON.parse(reviewRulesData);
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `代码评审类别:\n${JSON.stringify({
+            categories: reviewCategories,
+            rules: reviewRules.reviewCategories || {}
+          }, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 获取用户可选规则
+  async handleGetUserSelectableRules(args) {
+    const userRulesPath = path.join(this.rulesPath, 'user-selectable-rules.json');
+    
+    if (!fs.existsSync(userRulesPath)) {
+      throw new Error(`用户可选规则文件不存在: ${userRulesPath}`);
+    }
+    
+    const userRulesData = fs.readFileSync(userRulesPath, 'utf8');
+    const userRules = JSON.parse(userRulesData);
+    
+    const category = args?.category || 'all';
+    
+    if (category !== 'all') {
+      const categoryRules = userRules.ruleCategories?.[category] || null;
+      if (!categoryRules) {
+        throw new Error(`规则类别不存在: ${category}`);
+      }
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `规则类别 (${category}):\n${JSON.stringify(categoryRules, null, 2)}`,
+          },
+        ],
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `用户可选规则:\n${JSON.stringify({
+            categories: userRules.ruleCategories,
+            presets: userRules.ruleSelectionUI?.presets
+          }, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 设置用户自定义规则
+  async handleSetUserRules(args) {
+    const preset = args?.preset;
+    const customRules = args?.custom_rules;
+
+    // 确保配置目录存在
+    if (!fs.existsSync(this.outputDirectories.config)) {
+      fs.mkdirSync(this.outputDirectories.config, { recursive: true });
+    }
+
+    const userConfig = {
+      preset: preset || 'custom',
+      customRules: customRules || {},
+      lastUpdated: new Date().toISOString()
+    };
+
+    fs.writeFileSync(this.userConfigPath, JSON.stringify(userConfig, null, 2));
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `✅ 用户规则设置成功\n预设: ${preset || '自定义'}\n配置已保存到: ${this.userConfigPath}`,
+        },
+      ],
+    };
+  }
+
+  // 验证输出文件
+  async handleVerifyOutputFiles(args) {
+    if (!this.config) {
+      await this.handleLoadConfig();
+    }
+
+    const requirementName = args?.requirement_name || '未知需求';
+    const checkTypes = args?.check_types || ['all'];
+
+    const stage5Config = this.config.workflowConfig?.stage5_final_verification || {};
+    const verificationItems = stage5Config.verificationItems || {};
+
+    const verificationResults = [];
+    let allPassed = true;
+
+    for (const [key, item] of Object.entries(verificationItems)) {
+      if (checkTypes.length > 0 && !checkTypes.includes('all') && !checkTypes.includes(key)) {
+        continue;
+      }
+
+      const location = item.location.replace('{需求名称}', requirementName);
+      const pattern = item.pattern.replace('{需求名称}', requirementName);
+      
+      // 检查文件是否存在
+      let exists = false;
+      let files = [];
+
+      if (fs.existsSync(location)) {
+        files = fs.readdirSync(location).filter(f => {
+          // 简单的模式匹配
+          const basePattern = pattern.replace('{时间戳}', '').replace('{日期}', '').replace('*', '');
+          return f.includes(requirementName);
+        });
+        exists = files.length > 0;
+      }
+
+      const result = {
+        type: key,
+        required: item.required,
+        exists: exists,
+        files: files,
+        status: exists ? '✅ 通过' : (item.required ? '❌ 缺失' : '⚠️ 可选')
+      };
+
+      verificationResults.push(result);
+
+      if (item.required && !exists) {
+        allPassed = false;
+      }
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `文件验证结果 (${requirementName}):\n${JSON.stringify({
+            allPassed: allPassed,
+            results: verificationResults,
+            summary: allPassed ? '✅ 所有必需文件已生成' : '❌ 存在缺失的必需文件'
+          }, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 获取输出目录配置
+  async handleGetOutputDirectories() {
+    const directories = {};
+    
+    for (const [key, dir] of Object.entries(this.outputDirectories)) {
+      directories[key] = {
+        path: dir,
+        exists: fs.existsSync(dir)
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `输出目录配置:\n${JSON.stringify(directories, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 确保输出目录存在
+  async handleEnsureOutputDirectories() {
+    await this.ensureDirectoriesExist();
+
+    const results = [];
+    for (const [key, dir] of Object.entries(this.outputDirectories)) {
+      results.push({
+        name: key,
+        path: dir,
+        created: fs.existsSync(dir)
+      });
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `✅ 输出目录已创建:\n${JSON.stringify(results, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  // 确保目录存在
+  async ensureDirectoriesExist() {
+    for (const dir of Object.values(this.outputDirectories)) {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    }
+  }
+
+  // 获取执行顺序
+  async handleGetExecutionSequence() {
+    if (!this.config) {
+      await this.handleLoadConfig();
+    }
+
+    const executionSequence = this.config.executionSequence || {};
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `执行顺序:\n${JSON.stringify(executionSequence, null, 2)}`,
+        },
+      ],
+    };
   }
 
   // 启动服务器
   async run() {
     try {
-      console.error('🚀 启动JoyCode MCP服务器 v2.0.0 - 发布版...');
+      console.error('🚀 启动JoyCode MCP服务器 v4.0.0 - 增强版...');
+      console.error('📋 支持的工作流阶段: PRD分析 → 代码生成 → 流程图生成 → 代码评审 → 最终验证');
       
       const transport = new StdioServerTransport();
       await this.server.connect(transport);

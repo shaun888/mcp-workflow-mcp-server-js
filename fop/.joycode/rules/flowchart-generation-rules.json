@@ -205,5 +205,265 @@
       "图形样式统一",
       "颜色使用规范"
     ]
+  },
+  
+  "sequenceDiagramConfig": {
+    "description": "时序图生成配置",
+    "enabled": true,
+    "output": {
+      "location": "fop/.joycode/flowcharts/",
+      "filename": "{需求名称}-sequence-diagram-{时间戳}.md"
+    },
+    "diagramTypes": {
+      "apiCallSequence": {
+        "name": "API调用时序图",
+        "description": "展示API调用的完整时序流程",
+        "mermaidType": "sequenceDiagram",
+        "elements": [
+          "客户端请求",
+          "网关认证",
+          "服务处理",
+          "数据库操作",
+          "外部服务调用",
+          "响应返回"
+        ],
+        "template": [
+          "```mermaid",
+          "sequenceDiagram",
+          "    autonumber",
+          "    participant C as 客户端",
+          "    participant G as API网关",
+          "    participant S as 业务服务",
+          "    participant D as 数据层",
+          "    participant E as 外部服务",
+          "    ",
+          "    C->>+G: 发送请求",
+          "    G->>G: 身份验证",
+          "    G->>+S: 转发请求",
+          "    S->>S: 业务校验",
+          "    S->>+D: 数据操作",
+          "    D-->>-S: 返回数据",
+          "    alt 需要调用外部服务",
+          "        S->>+E: 调用外部接口",
+          "        E-->>-S: 返回结果",
+          "    end",
+          "    S-->>-G: 返回处理结果",
+          "    G-->>-C: 返回响应",
+          "```"
+        ]
+      },
+      "businessProcessSequence": {
+        "name": "业务流程时序图",
+        "description": "展示业务处理的完整时序",
+        "mermaidType": "sequenceDiagram",
+        "elements": [
+          "业务触发",
+          "规则校验",
+          "业务处理",
+          "状态变更",
+          "通知发送"
+        ]
+      },
+      "dataSyncSequence": {
+        "name": "数据同步时序图",
+        "description": "展示数据同步流程时序",
+        "mermaidType": "sequenceDiagram",
+        "elements": [
+          "数据源",
+          "同步服务",
+          "目标系统",
+          "消息队列",
+          "日志记录"
+        ]
+      }
+    },
+    "generationRules": {
+      "participantNaming": {
+        "rule": "使用简洁明了的参与者名称",
+        "format": "缩写作为参与者ID，中文名称作为显示名",
+        "example": "participant C as 客户端"
+      },
+      "messageFlow": {
+        "rule": "清晰标注消息类型",
+        "types": {
+          "syncCall": "->> 实线箭头表示同步调用",
+          "asyncCall": "-)>> 虚线箭头表示异步调用",
+          "return": "-->> 虚线箭头表示返回",
+          "selfCall": "->> 自调用"
+        }
+      },
+      "activationBar": {
+        "enabled": true,
+        "description": "使用激活条表示对象活跃期",
+        "syntax": "+/- 表示激活/失活"
+      },
+      "altBlock": {
+        "enabled": true,
+        "description": "使用alt表示条件分支",
+        "syntax": "alt ... else ... end"
+      },
+      "loopBlock": {
+        "enabled": true,
+        "description": "使用loop表示循环",
+        "syntax": "loop ... end"
+      }
+    }
+  },
+  
+  "outputVerification": {
+    "description": "文件输出验证机制，确保所有文件都正确生成",
+    "enabled": true,
+    "verificationSteps": [
+      {
+        "step": "文件存在性检查",
+        "description": "验证文件是否成功创建",
+        "checkItems": [
+          "检查文件路径是否存在",
+          "检查文件大小是否大于0",
+          "检查文件权限是否正确"
+        ]
+      },
+      {
+        "step": "内容完整性检查",
+        "description": "验证文件内容是否完整",
+        "checkItems": [
+          "检查Mermaid语法是否正确",
+          "检查必要章节是否完整",
+          "检查元数据是否包含"
+        ]
+      },
+      {
+        "step": "格式规范检查",
+        "description": "验证文件格式是否符合规范",
+        "checkItems": [
+          "检查文件命名是否规范",
+          "检查Markdown格式是否正确",
+          "检查代码块是否正确闭合"
+        ]
+      }
+    ],
+    "verificationReport": {
+      "location": "fop/.joycode/reports/",
+      "filename": "{需求名称}-output-verification-report-{时间戳}.md",
+      "content": [
+        "# 输出验证报告",
+        "",
+        "## 📋 验证概览",
+        "- 验证时间",
+        "- 验证文件数量",
+        "- 通过/失败数量",
+        "",
+        "## 📄 文件验证详情",
+        "### PRD分析文件",
+        "### 代码文件",
+        "### 流程图文件",
+        "### 时序图文件",
+        "",
+        "## ⚠️ 问题列表",
+        "### 缺失文件",
+        "### 内容不完整",
+        "### 格式问题",
+        "",
+        "## ✅ 验证总结"
+      ]
+    },
+    "failureHandling": {
+      "description": "验证失败时的处理策略",
+      "actions": [
+        "记录失败原因到日志",
+        "生成验证报告",
+        "提示用户缺失的文件",
+        "提供修复建议"
+      ]
+    }
+  },
+  
+  "enhancedOutput": {
+    "description": "增强的输出规范，确保所有阶段都正确输出文件",
+    "enabled": true,
+    "outputFiles": {
+      "prdAnalysis": {
+        "required": true,
+        "location": "fop/.joycode/",
+        "filename": "{需求名称}-prd-analysis-summary.md",
+        "description": "PRD分析文档，后续阶段依赖此文件"
+      },
+      "codeStructureAnalysis": {
+        "required": false,
+        "location": "fop/.joycode/analysis/",
+        "filename": "{需求名称}-code-structure-analysis-{时间戳}.md",
+        "description": "代码结构分析文档"
+      },
+      "businessCodeIdentification": {
+        "required": false,
+        "location": "fop/.joycode/analysis/",
+        "filename": "{需求名称}-business-code-identification-{时间戳}.md",
+        "description": "业务代码识别文档"
+      },
+      "modificationPoints": {
+        "required": false,
+        "location": "fop/.joycode/analysis/",
+        "filename": "{需求名称}-modification-points-{时间戳}.md",
+        "description": "修改点识别文档"
+      },
+      "codeModificationPlan": {
+        "required": false,
+        "location": "fop/.joycode/plans/",
+        "filename": "{需求名称}-code-modification-plan-{时间戳}.md",
+        "description": "代码修改方案文档"
+      },
+      "generatedCode": {
+        "required": true,
+        "location": "fop/.joycode/generated-code/",
+        "filename": "{需求名称}-{模块类型}-{时间戳}.java",
+        "description": "生成的代码文件"
+      },
+      "codeGenerationLog": {
+        "required": true,
+        "location": "fop/.joycode/logs/",
+        "filename": "{需求名称}-code-generation-log-{时间戳}.md",
+        "description": "代码生成日志"
+      },
+      "businessFlowchart": {
+        "required": true,
+        "location": "fop/.joycode/flowcharts/",
+        "filename": "{需求名称}-business-flow-{时间戳}.md",
+        "description": "业务流程图"
+      },
+      "technicalArchitecture": {
+        "required": true,
+        "location": "fop/.joycode/flowcharts/",
+        "filename": "{需求名称}-technical-architecture-{时间戳}.md",
+        "description": "技术架构图"
+      },
+      "sequenceDiagram": {
+        "required": true,
+        "location": "fop/.joycode/flowcharts/",
+        "filename": "{需求名称}-sequence-diagram-{时间戳}.md",
+        "description": "时序图"
+      },
+      "codeReviewReport": {
+        "required": true,
+        "location": "fop/.joycode/reports/",
+        "filename": "{需求名称}-code-review-report-{时间戳}.md",
+        "description": "代码评审报告"
+      },
+      "implementationSummary": {
+        "required": true,
+        "location": "fop/.joycode/implementation-summary/",
+        "filename": "{需求名称}-implementation-summary.md",
+        "description": "实现总结文档"
+      }
+    },
+    "dependencyCheck": {
+      "description": "检查文件依赖关系",
+      "enabled": true,
+      "rules": [
+        "代码生成依赖PRD分析文件",
+        "流程图生成依赖PRD分析文件和代码文件",
+        "时序图生成依赖代码文件",
+        "代码评审依赖代码文件"
+      ]
+    }
   }
 }

@@ -214,6 +214,178 @@
       "prevention": "定期验证缓存数据完整性"
     }
   },
+  "enhancedCodeAnalysisWorkflow": {
+    "description": "增强的代码分析工作流，包含完整的代码分析、识别、方案生成和实施步骤",
+    "enabled": true,
+    "steps": {
+      "step1_existingCodeAnalysis": {
+        "name": "现有代码结构分析",
+        "description": "分析现有代码库的结构和架构",
+        "enabled": true,
+        "output": {
+          "location": "fop/.joycode/analysis/",
+          "filename": "{需求名称}-code-structure-analysis-{时间戳}.md"
+        },
+        "process": [
+          "扫描项目目录结构，识别模块划分",
+          "分析项目架构分层（Controller/Service/DAO等）",
+          "识别核心业务模块和公共组件",
+          "梳理模块间依赖关系",
+          "记录技术栈信息（框架版本、中间件等）"
+        ],
+        "analysisItems": [
+          {
+            "name": "项目结构",
+            "description": "分析项目的整体结构",
+            "checkPoints": [
+              "模块划分是否清晰",
+              "分层架构是否合理",
+              "依赖关系是否正确"
+            ]
+          },
+          {
+            "name": "核心模块",
+            "description": "识别项目的核心业务模块",
+            "checkPoints": [
+              "业务核心类识别",
+              "核心接口识别",
+              "核心数据模型识别"
+            ]
+          }
+        ]
+      },
+      "step2_businessCodeIdentification": {
+        "name": "梳理业务相关代码",
+        "description": "根据需求关键词识别相关业务代码",
+        "enabled": true,
+        "output": {
+          "location": "fop/.joycode/analysis/",
+          "filename": "{需求名称}-business-code-identification-{时间戳}.md"
+        },
+        "process": [
+          "从PRD分析文档提取业务关键词",
+          "基于关键词搜索相关代码文件",
+          "分析代码调用链路",
+          "识别数据模型关联",
+          "梳理业务流程入口点"
+        ],
+        "identificationMethods": {
+          "keywordMatching": {
+            "description": "关键词匹配方法",
+            "priority": 1,
+            "implementation": "匹配类名、方法名、注释中的业务关键词"
+          },
+          "dataModelMatching": {
+            "description": "数据模型匹配方法",
+            "priority": 2,
+            "implementation": "匹配涉及的核心数据实体和数据表"
+          },
+          "interfaceMatching": {
+            "description": "接口匹配方法",
+            "priority": 3,
+            "implementation": "匹配API接口路径和接口定义"
+          }
+        }
+      },
+      "step3_modificationPointIdentification": {
+        "name": "识别需要修改的代码位置",
+        "description": "精确定位需要修改的代码位置",
+        "enabled": true,
+        "output": {
+          "location": "fop/.joycode/analysis/",
+          "filename": "{需求名称}-modification-points-{时间戳}.md"
+        },
+        "process": [
+          "基于业务代码识别结果，确定修改范围",
+          "分析每个修改点的影响范围",
+          "评估修改风险和复杂度",
+          "确定修改优先级",
+          "生成修改点清单"
+        ],
+        "modificationTypes": {
+          "newFeature": {
+            "description": "新增功能",
+            "analysisPoints": [
+              "确定新增功能的位置",
+              "分析需要新增的类/方法",
+              "确定与现有代码的集成点"
+            ]
+          },
+          "bugFix": {
+            "description": "问题修复",
+            "analysisPoints": [
+              "定位问题代码位置",
+              "分析问题根因",
+              "确定修复方案影响范围"
+            ]
+          },
+          "refactor": {
+            "description": "代码重构",
+            "analysisPoints": [
+              "识别需要重构的代码",
+              "分析重构影响范围",
+              "确定重构步骤"
+            ]
+          },
+          "optimization": {
+            "description": "性能优化",
+            "analysisPoints": [
+              "定位性能瓶颈",
+              "分析优化方案",
+              "评估优化效果"
+            ]
+          }
+        }
+      },
+      "step4_codeModificationPlan": {
+        "name": "生成代码修改方案",
+        "description": "生成详细的代码修改方案",
+        "enabled": true,
+        "output": {
+          "location": "fop/.joycode/plans/",
+          "filename": "{需求名称}-code-modification-plan-{时间戳}.md"
+        },
+        "process": [
+          "整理所有修改点",
+          "设计每个修改点的具体实现方案",
+          "评估修改影响和风险",
+          "制定修改顺序和依赖关系",
+          "生成完整的修改方案文档"
+        ],
+        "planStructure": {
+          "overview": "修改方案概述",
+          "modificationList": "修改点清单",
+          "implementationDetails": "具体实现细节",
+          "riskAssessment": "风险评估",
+          "testPlan": "测试计划",
+          "rollbackPlan": "回滚方案"
+        }
+      },
+      "step5_codeImplementation": {
+        "name": "实施代码修改",
+        "description": "根据方案实施代码修改",
+        "enabled": true,
+        "output": {
+          "location": "fop/.joycode/generated-code/",
+          "filename": "{需求名称}-{模块类型}-{时间戳}.java"
+        },
+        "process": [
+          "按照修改方案顺序实施修改",
+          "生成新增代码",
+          "修改现有代码",
+          "确保代码符合规范",
+          "生成代码修改日志"
+        ],
+        "implementationGuidelines": [
+          "遵循现有代码风格",
+          "保持向后兼容性",
+          "添加必要的注释和文档",
+          "处理边界情况和异常",
+          "考虑性能和安全性"
+        ]
+      }
+    }
+  },
   "futureOptimizations": [
     "机器学习模型预测方法相关性",
     "基于历史数据优化过滤策略",

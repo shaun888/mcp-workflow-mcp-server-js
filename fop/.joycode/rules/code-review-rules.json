@@ -1,0 +1,301 @@
+{
+  "ruleName": "代码评审规则",
+  "version": "1.0.0",
+  "description": "AI代码评审规则配置，用于评审生成的代码质量",
+  "lastUpdated": "2025-09-10",
+  
+  "reviewCategories": {
+    "codeQuality": {
+      "name": "代码质量",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "cq-001",
+          "name": "命名规范检查",
+          "description": "检查类名、方法名、变量名是否符合命名规范",
+          "severity": "warning",
+          "checkPoints": [
+            "类名使用PascalCase命名法",
+            "方法名使用camelCase命名法",
+            "常量使用UPPER_SNAKE_CASE命名法",
+            "命名应具有业务含义"
+          ]
+        },
+        {
+          "id": "cq-002",
+          "name": "代码注释检查",
+          "description": "检查代码注释是否完整",
+          "severity": "warning",
+          "checkPoints": [
+            "类必须有JavaDoc注释",
+            "公共方法必须有JavaDoc注释",
+            "复杂逻辑应有行内注释",
+            "注释应准确描述代码功能"
+          ]
+        },
+        {
+          "id": "cq-003",
+          "name": "代码复杂度检查",
+          "description": "检查方法复杂度是否合理",
+          "severity": "warning",
+          "checkPoints": [
+            "方法长度不超过80行",
+            "圈复杂度不超过10",
+            "嵌套层级不超过4层",
+            "参数数量不超过5个"
+          ]
+        }
+      ]
+    },
+    
+    "securityCheck": {
+      "name": "安全检查",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "sc-001",
+          "name": "SQL注入防护",
+          "description": "检查是否存在SQL注入风险",
+          "severity": "critical",
+          "checkPoints": [
+            "不使用字符串拼接SQL",
+            "使用参数化查询",
+            "对用户输入进行过滤"
+          ]
+        },
+        {
+          "id": "sc-002",
+          "name": "XSS防护",
+          "description": "检查是否存在XSS攻击风险",
+          "severity": "critical",
+          "checkPoints": [
+            "输出内容进行HTML转义",
+            "不直接渲染用户输入",
+            "使用安全的模板引擎"
+          ]
+        },
+        {
+          "id": "sc-003",
+          "name": "敏感数据处理",
+          "description": "检查敏感数据的处理方式",
+          "severity": "high",
+          "checkPoints": [
+            "敏感数据加密存储",
+            "日志不输出敏感信息",
+            "接口不返回敏感数据明文"
+          ]
+        }
+      ]
+    },
+    
+    "performanceCheck": {
+      "name": "性能检查",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "pc-001",
+          "name": "数据库查询优化",
+          "description": "检查数据库查询是否存在性能问题",
+          "severity": "high",
+          "checkPoints": [
+            "避免N+1查询问题",
+            "合理使用索引",
+            "避免全表扫描",
+            "分页查询大数据集"
+          ]
+        },
+        {
+          "id": "pc-002",
+          "name": "缓存使用检查",
+          "description": "检查缓存使用是否合理",
+          "severity": "medium",
+          "checkPoints": [
+            "热点数据使用缓存",
+            "缓存过期时间合理",
+            "缓存穿透防护",
+            "缓存一致性处理"
+          ]
+        },
+        {
+          "id": "pc-003",
+          "name": "循环优化检查",
+          "description": "检查循环是否存在性能问题",
+          "severity": "medium",
+          "checkPoints": [
+            "避免在循环中创建对象",
+            "避免在循环中进行数据库操作",
+            "减少循环嵌套层级"
+          ]
+        }
+      ]
+    },
+    
+    "exceptionHandling": {
+      "name": "异常处理",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "eh-001",
+          "name": "异常捕获检查",
+          "description": "检查异常捕获是否合理",
+          "severity": "high",
+          "checkPoints": [
+            "不捕获Exception级别的异常",
+            "异常捕获后必须处理或向上抛出",
+            "异常信息必须包含上下文",
+            "资源释放使用try-with-resources"
+          ]
+        },
+        {
+          "id": "eh-002",
+          "name": "异常日志检查",
+          "description": "检查异常日志记录是否完整",
+          "severity": "medium",
+          "checkPoints": [
+            "异常必须记录日志",
+            "日志包含完整的异常堆栈",
+            "关键业务异常单独记录"
+          ]
+        }
+      ]
+    },
+    
+    "businessLogic": {
+      "name": "业务逻辑检查",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "bl-001",
+          "name": "参数校验检查",
+          "description": "检查入参校验是否完整",
+          "severity": "high",
+          "checkPoints": [
+            "必填参数非空校验",
+            "参数格式校验",
+            "参数范围校验",
+            "业务规则校验"
+          ]
+        },
+        {
+          "id": "bl-002",
+          "name": "边界条件检查",
+          "description": "检查边界条件处理",
+          "severity": "medium",
+          "checkPoints": [
+            "空集合处理",
+            "空指针处理",
+            "数值边界处理",
+            "并发场景处理"
+          ]
+        },
+        {
+          "id": "bl-003",
+          "name": "事务处理检查",
+          "description": "检查事务处理是否正确",
+          "severity": "high",
+          "checkPoints": [
+            "事务边界正确",
+            "事务传播行为正确",
+            "异常回滚处理正确",
+            "分布式事务处理"
+          ]
+        }
+      ]
+    },
+    
+    "architectureCompliance": {
+      "name": "架构规范检查",
+      "enabled": true,
+      "defaultEnabled": true,
+      "rules": [
+        {
+          "id": "ac-001",
+          "name": "分层架构检查",
+          "description": "检查代码是否符合分层架构",
+          "severity": "high",
+          "checkPoints": [
+            "Controller层只做参数转换",
+            "Service层处理业务逻辑",
+            "DAO层只做数据访问",
+            "跨层调用方向正确"
+          ]
+        },
+        {
+          "id": "ac-002",
+          "name": "接口设计检查",
+          "description": "检查接口设计是否合理",
+          "severity": "medium",
+          "checkPoints": [
+            "接口职责单一",
+            "接口版本控制",
+            "接口兼容性设计",
+            "接口幂等性设计"
+          ]
+        }
+      ]
+    }
+  },
+  
+  "reviewOutput": {
+    "reportLocation": "fop/.joycode/reports/",
+    "reportFilename": "{需求名称}-code-review-report-{时间戳}.md",
+    "reportStructure": [
+      "# 代码评审报告",
+      "",
+      "## 📊 评审概览",
+      "- 评审时间",
+      "- 评审范围",
+      "- 整体评分",
+      "",
+      "## 🔍 详细评审结果",
+      "### 代码质量",
+      "### 安全检查",
+      "### 性能检查",
+      "### 异常处理",
+      "### 业务逻辑",
+      "### 架构规范",
+      "",
+      "## ⚠️ 问题列表",
+      "### 严重问题",
+      "### 一般问题",
+      "### 建议优化",
+      "",
+      "## 💡 优化建议",
+      "",
+      "## 📝 评审总结"
+    ]
+  },
+  
+  "severityLevels": {
+    "critical": {
+      "weight": 10,
+      "description": "严重问题，必须修复",
+      "color": "🔴"
+    },
+    "high": {
+      "weight": 7,
+      "description": "高优先级问题，建议修复",
+      "color": "🟠"
+    },
+    "medium": {
+      "weight": 4,
+      "description": "中等问题，可考虑修复",
+      "color": "🟡"
+    },
+    "warning": {
+      "weight": 2,
+      "description": "警告，可选修复",
+      "color": "🔵"
+    },
+    "info": {
+      "weight": 1,
+      "description": "信息提示",
+      "color": "⚪"
+    }
+  }
+}

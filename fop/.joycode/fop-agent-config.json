@@ -1,7 +1,7 @@
 {
   "agentName": "柯南智能体",
-  "version": "3.0.0",
-  "description": "京东FOP平台专业开发助手，负责需求分析、链路梳理和代码生成",
+  "version": "4.0.0",
+  "description": "京东FOP平台专业开发助手，负责需求分析、链路梳理、代码生成、流程图生成、代码评审和输出验证",
   "lastUpdated": "2025-09-10",
   
   "workflowConfig": {
@@ -10,18 +10,24 @@
       "input": "JoySpace PRD链接",
       "output": {
         "location": "fop/.joycode/",
-        "filename": "prd-analysis-summary.md",
+        "filename": "{需求名称}-prd-analysis-summary.md",
         "description": "使用需求名称命名，便于识别和管理"
       },
       "process": [
-        "不允许直接使用joyspace-mcp服务器来获取页面的详细内容，因为没有权限",
-        "使用https方式访问JoySpace PRD文档（如遇权限问题提示扫码登录）",
-        "读取完PRD后或者关闭浏览器后立马生成prd需求分析，不允许多次打开浏览器，梳理后立马开始后续阶段，后续阶段使用梳理后的prd进行",
+        "访问JoySpace PRD文档，如遇权限问题提示扫码登录",
+        "读取完PRD后或者关闭浏览器后立马生成prd需求分析，后续阶段使用梳理后的prd进行",
         "深度解析需求文档，提取业务逻辑和技术要求注意：主要关注prd中第一项内容：需求概述章节的内容，这是核心。包括：\n   - 需求概述（必选）\n   - 需求背景&业务现状（必选）\n   - 需求目标&收益（必选）",
         "识别系统模块和数据流向",
-        "生成结构化PRD分析文档"
+        "生成结构化PRD分析文档",
+        "验证PRD分析文件是否成功生成"
       ],
-      "rulesFile": "fop/.joycode/rules/prd-analysis-rules.json"
+      "rulesFile": "fop/.joycode/rules/prd-analysis-rules.json",
+      "verification": {
+        "enabled": true,
+        "checkFileExists": true,
+        "checkContentComplete": true,
+        "requiredSections": ["核心需求概述", "业务分析", "技术实现方案", "业务链路分析"]
+      }
     },
     
     "stage2_code_generation": {
@@ -41,10 +47,40 @@
       "process": [
         "**不再重新访问PRD链接**",
         "基于第一阶段已生成的{需求名称}-prd-analysis-summary.md",
+        "**Step 1: 现有代码结构分析** - 分析项目目录结构、模块划分、分层架构",
+        "**Step 2: 梳理业务相关代码** - 根据需求关键词识别相关业务代码",
+        "**Step 3: 识别需要修改的代码位置** - 精确定位修改点和影响范围",
+        "**Step 4: 生成代码修改方案** - 生成详细的修改方案文档",
+        "**Step 5: 实施代码修改** - 按方案生成或修改代码",
         "遵循fop/fop/.JoyCoderRules代码规范",
-        "按照FOP项目模块结构生成代码，修改代码，实现需求",
-        "生成代码生成日志文档到指定目录"
+        "生成代码生成日志文档到指定目录",
+        "验证所有输出文件是否成功生成"
       ],
+      "enhancedWorkflow": {
+        "enabled": true,
+        "steps": {
+          "step1_existingCodeAnalysis": {
+            "name": "现有代码结构分析",
+            "output": "fop/.joycode/analysis/{需求名称}-code-structure-analysis-{时间戳}.md"
+          },
+          "step2_businessCodeIdentification": {
+            "name": "梳理业务相关代码",
+            "output": "fop/.joycode/analysis/{需求名称}-business-code-identification-{时间戳}.md"
+          },
+          "step3_modificationPointIdentification": {
+            "name": "识别需要修改的代码位置",
+            "output": "fop/.joycode/analysis/{需求名称}-modification-points-{时间戳}.md"
+          },
+          "step4_codeModificationPlan": {
+            "name": "生成代码修改方案",
+            "output": "fop/.joycode/plans/{需求名称}-code-modification-plan-{时间戳}.md"
+          },
+          "step5_codeImplementation": {
+            "name": "实施代码修改",
+            "output": "fop/.joycode/generated-code/{需求名称}-{模块类型}-{时间戳}.java"
+          }
+        }
+      },
       "rulesFile": "fop/.joycode/rules/code-generation-rules.json",
       "smartCodeRetrieval": {
         "enabled": true,
@@ -67,6 +103,12 @@
         "avoidReAccess": true,
         "reuseAnalysis": "直接使用已生成的PRD分析文档",
         "intelligentFiltering": "使用智能过滤减少不必要的代码检索"
+      },
+      "verification": {
+        "enabled": true,
+        "checkDependencyFiles": ["{需求名称}-prd-analysis-summary.md"],
+        "checkOutputFiles": true,
+        "requiredOutputs": ["代码文件", "代码生成日志"]
       }
     },
     
@@ -82,8 +124,9 @@
         "location": "fop/.joycode/flowcharts/",
         "filename": "{需求名称}-{流程类型}-{日期}.md",
         "examples": [
-          "库存管理优化-business_process_flow-20250909.md",
-          "库存管理优化-technical_architecture_flow-20250909.md"
+          "库存管理优化-business_flow-20250909.md",
+          "库存管理优化-technical_architecture-20250909.md",
+          "库存管理优化-sequence_diagram-20250909.md"
         ]
       },
       "process": [
@@ -91,34 +134,195 @@
         "基于第一阶段生成的{需求名称}-prd-analysis-summary.md",
         "结合第二阶段生成的实际代码，生成精确的技术架构图",
         "基于实际代码调用关系生成业务流程图",
-        "明确文件位置和命名规范"
+        "**生成时序图** - 展示系统调用时序和API调用链路",
+        "明确文件位置和命名规范",
+        "验证所有流程图文件是否成功生成"
       ],
       "rulesFile": "fop/.joycode/rules/flowchart-generation-rules.json",
+      "flowchartTypes": {
+        "businessFlow": {
+          "enabled": true,
+          "description": "业务流程图，展示业务处理流程",
+          "mermaidType": "flowchart TD"
+        },
+        "technicalArchitecture": {
+          "enabled": true,
+          "description": "技术架构图，展示系统架构",
+          "mermaidType": "graph TB"
+        },
+        "sequenceDiagram": {
+          "enabled": true,
+          "description": "时序图，展示系统调用时序",
+          "mermaidType": "sequenceDiagram"
+        },
+        "apiCallChain": {
+          "enabled": true,
+          "description": "API调用链路图",
+          "mermaidType": "sequenceDiagram"
+        },
+        "dataFlow": {
+          "enabled": false,
+          "description": "数据流向图",
+          "mermaidType": "flowchart TB"
+        }
+      },
       "optimization": {
         "avoidReAccess": true,
         "reuseAnalysis": "直接使用已生成的PRD分析文档",
         "codeBasedGeneration": "基于实际生成的代码生成流程图，确保准确性"
+      },
+      "verification": {
+        "enabled": true,
+        "checkDependencyFiles": ["{需求名称}-prd-analysis-summary.md"],
+        "checkOutputFiles": true,
+        "requiredOutputs": ["业务流程图", "技术架构图", "时序图"]
       },
       "advantages": [
         "基于实际代码生成，流程图更准确可靠",
         "反映真实的技术实现架构",
         "便于代码review和后续维护"
       ]
+    },
+    
+    "stage4_code_review": {
+      "name": "代码评审阶段",
+      "priority": "在代码生成后执行，对生成的代码进行AI评审",
+      "input": [
+        "已生成的代码文件（必选）",
+        "代码修改方案文档（可选）"
+      ],
+      "output": {
+        "location": "fop/.joycode/reports/",
+        "filename": "{需求名称}-code-review-report-{时间戳}.md"
+      },
+      "process": [
+        "读取已生成的代码文件",
+        "根据代码评审规则进行检查",
+        "进行代码质量检查（命名规范、注释、复杂度）",
+        "进行安全检查（SQL注入、XSS、敏感数据）",
+        "进行性能检查（数据库查询、缓存、循环）",
+        "进行异常处理检查",
+        "进行业务逻辑检查（参数校验、边界条件、事务）",
+        "进行架构规范检查",
+        "生成代码评审报告",
+        "验证评审报告是否成功生成"
+      ],
+      "rulesFile": "fop/.joycode/rules/code-review-rules.json",
+      "reviewCategories": {
+        "codeQuality": {
+          "enabled": true,
+          "severity": "warning"
+        },
+        "securityCheck": {
+          "enabled": true,
+          "severity": "critical"
+        },
+        "performanceCheck": {
+          "enabled": true,
+          "severity": "high"
+        },
+        "exceptionHandling": {
+          "enabled": true,
+          "severity": "high"
+        },
+        "businessLogic": {
+          "enabled": true,
+          "severity": "high"
+        },
+        "architectureCompliance": {
+          "enabled": true,
+          "severity": "medium"
+        }
+      },
+      "verification": {
+        "enabled": true,
+        "checkDependencyFiles": ["代码文件"],
+        "checkOutputFiles": true,
+        "requiredOutputs": ["代码评审报告"]
+      }
+    },
+    
+    "stage5_final_verification": {
+      "name": "最终验证阶段",
+      "priority": "最后执行，验证所有输出文件",
+      "input": [
+        "所有阶段生成的文件"
+      ],
+      "output": {
+        "location": "fop/.joycode/reports/",
+        "filename": "{需求名称}-output-verification-report-{时间戳}.md"
+      },
+      "process": [
+        "检查PRD分析文件是否存在且完整",
+        "检查代码文件是否存在且完整",
+        "检查流程图文件是否存在且完整",
+        "检查时序图文件是否存在且完整",
+        "检查代码评审报告是否存在且完整",
+        "检查实现总结文档是否存在且完整",
+        "生成输出验证报告",
+        "提示用户缺失的文件"
+      ],
+      "rulesFile": "fop/.joycode/rules/flowchart-generation-rules.json",
+      "verificationItems": {
+        "prdAnalysis": {
+          "required": true,
+          "location": "fop/.joycode/",
+          "pattern": "{需求名称}-prd-analysis-summary.md"
+        },
+        "generatedCode": {
+          "required": true,
+          "location": "fop/.joycode/generated-code/",
+          "pattern": "{需求名称}-*.java"
+        },
+        "businessFlowchart": {
+          "required": true,
+          "location": "fop/.joycode/flowcharts/",
+          "pattern": "{需求名称}-business-flow-*.md"
+        },
+        "technicalArchitecture": {
+          "required": true,
+          "location": "fop/.joycode/flowcharts/",
+          "pattern": "{需求名称}-technical-architecture-*.md"
+        },
+        "sequenceDiagram": {
+          "required": true,
+          "location": "fop/.joycode/flowcharts/",
+          "pattern": "{需求名称}-sequence-diagram-*.md"
+        },
+        "codeReviewReport": {
+          "required": true,
+          "location": "fop/.joycode/reports/",
+          "pattern": "{需求名称}-code-review-report-*.md"
+        },
+        "implementationSummary": {
+          "required": true,
+          "location": "fop/.joycode/implementation-summary/",
+          "pattern": "{需求名称}-implementation-summary.md"
+        }
+      }
     }
   },
   
   "executionSequence": {
-    "description": "优化后的执行顺序：先生成代码，再生成流程图",
+    "description": "增强的执行顺序：PRD分析→代码生成→流程图生成→代码评审→最终验证",
     "rationale": [
       "代码生成是核心任务，应优先完成",
       "基于实际代码生成的流程图更准确",
-      "流程图可作为代码的文档补充"
+      "流程图可作为代码的文档补充",
+      "代码评审确保代码质量",
+      "最终验证确保所有文件正确输出"
     ],
     "sequence": [
       "stage1_prd_analysis",
       "stage2_code_generation", 
-      "stage3_flowchart_generation"
-    ]
+      "stage3_flowchart_generation",
+      "stage4_code_review",
+      "stage5_final_verification"
+    ],
+    "parallelExecution": {
+      "enabled": false,
+      "description": "暂不支持并行执行，各阶段有依赖关系"
+    }
   },
   
   "smartRetrievalConfig": {
@@ -161,8 +365,17 @@
     "principle": "所有生成文件使用需求名称作为前缀，便于识别和管理",
     "patterns": {
       "prd_analysis": "{需求名称}-prd-analysis-summary.md",
+      "code_structure_analysis": "{需求名称}-code-structure-analysis-{时间戳}.md",
+      "business_code_identification": "{需求名称}-business-code-identification-{时间戳}.md",
+      "modification_points": "{需求名称}-modification-points-{时间戳}.md",
+      "code_modification_plan": "{需求名称}-code-modification-plan-{时间戳}.md",
       "code": "{需求名称}-{模块}-{时间戳}.java",
-      "flowchart": "{需求名称}-{类型}-{日期}.md",
+      "business_flow": "{需求名称}-business-flow-{时间戳}.md",
+      "technical_architecture": "{需求名称}-technical-architecture-{时间戳}.md",
+      "sequence_diagram": "{需求名称}-sequence-diagram-{时间戳}.md",
+      "code_review_report": "{需求名称}-code-review-report-{时间戳}.md",
+      "output_verification_report": "{需求名称}-output-verification-report-{时间戳}.md",
+      "implementation_summary": "{需求名称}-implementation-summary.md",
       "log": "{需求名称}-{阶段}-log-{时间戳}.md"
     }
   },
@@ -171,7 +384,9 @@
     "avoidDuplicateWork": {
       "stage1": "访问PRD链接，生成分析文档",
       "stage2": "基于分析文档生成代码，使用智能检索优化",
-      "stage3": "基于分析文档和生成的代码生成流程图"
+      "stage3": "基于分析文档和生成的代码生成流程图",
+      "stage4": "基于生成的代码进行代码评审",
+      "stage5": "验证所有输出文件"
     },
     "intelligentRetrieval": {
       "description": "使用智能过滤算法提升代码检索效率",
@@ -209,6 +424,18 @@
       "structure": "按照FOP项目模块划分生成代码",
       "quality": "保持代码风格一致性和可读性",
       "documentation": "添加必要的注释和文档"
+    },
+    
+    "codeReview": {
+      "enabled": true,
+      "description": "AI代码评审，检查代码质量、安全、性能等问题",
+      "categories": ["代码质量", "安全检查", "性能检查", "异常处理", "业务逻辑", "架构规范"]
+    },
+    
+    "outputVerification": {
+      "enabled": true,
+      "description": "验证所有输出文件是否正确生成",
+      "checkItems": ["文件存在性", "内容完整性", "格式规范性", "依赖关系"]
     }
   },
   
@@ -218,8 +445,11 @@
     "ruleFiles": [
       "fop/.joycode/rules/prd-analysis-rules.json",
       "fop/.joycode/rules/code-generation-rules.json",
-      "fop/.joycode/rules/flowchart-generation-rules.json"
-    ]
+      "fop/.joycode/rules/flowchart-generation-rules.json",
+      "fop/.joycode/rules/code-review-rules.json",
+      "fop/.joycode/rules/user-selectable-rules.json"
+    ],
+    "userConfig": "fop/.joycode/config/user-rules-config.json"
   },
   
   "mcpServers": {
@@ -232,6 +462,23 @@
     "generatedCode": "fop/.joycode/generated-code/",
     "flowcharts": "fop/.joycode/flowcharts/",
     "logs": "fop/.joycode/logs/",
-    "rules": "fop/.joycode/rules/"
+    "rules": "fop/.joycode/rules/",
+    "reports": "fop/.joycode/reports/",
+    "plans": "fop/.joycode/plans/",
+    "implementationSummary": "fop/.joycode/implementation-summary/",
+    "config": "fop/.joycode/config/"
+  },
+  
+  "userSelectableRules": {
+    "description": "用户可选规则配置",
+    "enabled": true,
+    "configFile": "fop/.joycode/rules/user-selectable-rules.json",
+    "presets": {
+      "minimal": "最小配置 - 只启用核心功能",
+      "standard": "标准配置 - 启用常用功能（推荐）",
+      "complete": "完整配置 - 启用所有功能",
+      "development": "开发调试配置 - 启用所有检查和报告"
+    },
+    "defaultPreset": "standard"
   }
 }

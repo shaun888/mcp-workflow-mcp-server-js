@@ -1,0 +1,334 @@
+{
+  "ruleName": "用户可选规则配置",
+  "version": "1.0.0",
+  "description": "允许用户自定义选择需要的规则模块，提供灵活的工作流配置",
+  "lastUpdated": "2025-09-10",
+  
+  "ruleCategories": {
+    "prdAnalysis": {
+      "name": "PRD分析规则",
+      "description": "控制PRD文档分析的规则选项",
+      "defaultEnabled": true,
+      "userCanToggle": true,
+      "subRules": {
+        "templateContentFilter": {
+          "name": "模板内容过滤",
+          "description": "自动跳过PRD中的模板说明和填写指南",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "navigationOptimization": {
+          "name": "导航优化",
+          "description": "优先使用左侧导航快速定位核心章节",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "fopSpecificAnalysis": {
+          "name": "FOP专属分析",
+          "description": "启用FOP系统模块映射和业务流程分析",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "speedOptimization": {
+          "name": "速度优化",
+          "description": "启用快速扫描和关键词高亮",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        }
+      }
+    },
+    
+    "codeGeneration": {
+      "name": "代码生成规则",
+      "description": "控制代码生成的规则选项",
+      "defaultEnabled": true,
+      "userCanToggle": true,
+      "subRules": {
+        "intelligentRetrieval": {
+          "name": "智能检索",
+          "description": "启用智能代码检索优化，减少无效代码分析",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "existingCodeAnalysis": {
+          "name": "现有代码结构分析",
+          "description": "分析现有代码结构，识别模块划分",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "businessCodeIdentification": {
+          "name": "业务代码识别",
+          "description": "根据需求关键词识别相关业务代码",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "modificationPointIdentification": {
+          "name": "修改点识别",
+          "description": "精确定位需要修改的代码位置",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "codeModificationPlan": {
+          "name": "代码修改方案生成",
+          "description": "生成详细的代码修改方案文档",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "codeStandards": {
+          "name": "代码规范检查",
+          "description": "生成代码时进行命名规范、注释规范检查",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "qualityAssurance": {
+          "name": "质量保证",
+          "description": "生成代码质量检查，包括性能和安全考虑",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        }
+      }
+    },
+    
+    "flowchartGeneration": {
+      "name": "流程图生成规则",
+      "description": "控制流程图生成的规则选项",
+      "defaultEnabled": true,
+      "userCanToggle": true,
+      "subRules": {
+        "businessFlowchart": {
+          "name": "业务流程图",
+          "description": "生成业务流程图，展示业务处理流程",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "technicalArchitecture": {
+          "name": "技术架构图",
+          "description": "生成技术架构图，展示系统架构",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "sequenceDiagram": {
+          "name": "时序图",
+          "description": "生成时序图，展示系统调用时序",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "apiCallChain": {
+          "name": "API调用链路图",
+          "description": "生成API调用链路图",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "dataFlowDiagram": {
+          "name": "数据流向图",
+          "description": "生成数据流向图",
+          "defaultEnabled": false,
+          "userCanToggle": true
+        }
+      }
+    },
+    
+    "codeReview": {
+      "name": "代码评审规则",
+      "description": "控制代码评审的规则选项",
+      "defaultEnabled": true,
+      "userCanToggle": true,
+      "subRules": {
+        "codeQuality": {
+          "name": "代码质量检查",
+          "description": "检查命名规范、注释、复杂度等",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "securityCheck": {
+          "name": "安全检查",
+          "description": "检查SQL注入、XSS、敏感数据处理等",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "performanceCheck": {
+          "name": "性能检查",
+          "description": "检查数据库查询、缓存、循环等性能问题",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "exceptionHandling": {
+          "name": "异常处理检查",
+          "description": "检查异常捕获和日志记录",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "businessLogic": {
+          "name": "业务逻辑检查",
+          "description": "检查参数校验、边界条件、事务处理",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "architectureCompliance": {
+          "name": "架构规范检查",
+          "description": "检查分层架构和接口设计",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        }
+      }
+    },
+    
+    "outputVerification": {
+      "name": "输出验证规则",
+      "description": "控制输出文件验证的规则选项",
+      "defaultEnabled": true,
+      "userCanToggle": true,
+      "subRules": {
+        "fileExistenceCheck": {
+          "name": "文件存在性检查",
+          "description": "验证所有输出文件是否成功创建",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "contentCompletenessCheck": {
+          "name": "内容完整性检查",
+          "description": "验证文件内容是否完整",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "formatComplianceCheck": {
+          "name": "格式规范检查",
+          "description": "验证文件格式是否符合规范",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "dependencyCheck": {
+          "name": "依赖关系检查",
+          "description": "验证文件间的依赖关系是否满足",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        },
+        "generateVerificationReport": {
+          "name": "生成验证报告",
+          "description": "生成详细的验证报告文档",
+          "defaultEnabled": true,
+          "userCanToggle": true
+        }
+      }
+    }
+  },
+  
+  "ruleSelectionUI": {
+    "description": "规则选择界面配置，用于前端展示",
+    "displayOrder": [
+      "prdAnalysis",
+      "codeGeneration",
+      "flowchartGeneration",
+      "codeReview",
+      "outputVerification"
+    ],
+    "uiConfig": {
+      "showDescription": true,
+      "showDefaultValue": true,
+      "allowSelectAll": true,
+      "allowDeselectAll": true,
+      "rememberSelection": true
+    },
+    "presets": {
+      "minimal": {
+        "name": "最小配置",
+        "description": "只启用核心功能，生成基本输出",
+        "enabledRules": [
+          "prdAnalysis.templateContentFilter",
+          "codeGeneration.intelligentRetrieval",
+          "flowchartGeneration.businessFlowchart",
+          "outputVerification.fileExistenceCheck"
+        ]
+      },
+      "standard": {
+        "name": "标准配置",
+        "description": "启用常用功能，适合大多数场景",
+        "enabledRules": [
+          "prdAnalysis.default",
+          "codeGeneration.default",
+          "flowchartGeneration.businessFlowchart",
+          "flowchartGeneration.technicalArchitecture",
+          "flowchartGeneration.sequenceDiagram",
+          "codeReview.codeQuality",
+          "codeReview.securityCheck",
+          "outputVerification.default"
+        ]
+      },
+      "complete": {
+        "name": "完整配置",
+        "description": "启用所有功能，生成完整输出",
+        "enabledRules": [
+          "prdAnalysis.default",
+          "codeGeneration.default",
+          "flowchartGeneration.default",
+          "codeReview.default",
+          "outputVerification.default"
+        ]
+      },
+      "development": {
+        "name": "开发调试配置",
+        "description": "开发调试时使用，启用所有检查和报告",
+        "enabledRules": [
+          "prdAnalysis.default",
+          "codeGeneration.default",
+          "flowchartGeneration.default",
+          "codeReview.default",
+          "outputVerification.default"
+        ],
+        "additionalSettings": {
+          "verbose": true,
+          "generateDebugLog": true,
+          "includeStackTrace": true
+        }
+      }
+    }
+  },
+  
+  "ruleApplication": {
+    "description": "规则应用逻辑",
+    "applyRules": [
+      {
+        "stage": "stage1_prd_analysis",
+        "rulesFrom": ["prdAnalysis"],
+        "description": "PRD分析阶段应用PRD分析规则"
+      },
+      {
+        "stage": "stage2_code_generation",
+        "rulesFrom": ["codeGeneration"],
+        "description": "代码生成阶段应用代码生成规则"
+      },
+      {
+        "stage": "stage3_flowchart_generation",
+        "rulesFrom": ["flowchartGeneration"],
+        "description": "流程图生成阶段应用流程图规则"
+      },
+      {
+        "stage": "stage4_code_review",
+        "rulesFrom": ["codeReview"],
+        "description": "代码评审阶段应用代码评审规则"
+      },
+      {
+        "stage": "final_verification",
+        "rulesFrom": ["outputVerification"],
+        "description": "最终验证阶段应用输出验证规则"
+      }
+    ],
+    "conflictResolution": {
+      "description": "规则冲突解决策略",
+      "strategy": "userOverride",
+      "fallbackOrder": [
+        "用户配置",
+        "预设配置",
+        "默认配置"
+      ]
+    }
+  },
+  
+  "userConfigurationStorage": {
+    "description": "用户配置存储",
+    "location": "fop/.joycode/config/user-rules-config.json",
+    "format": "json",
+    "saveOnChange": true,
+    "versioning": true
+  }
+}
